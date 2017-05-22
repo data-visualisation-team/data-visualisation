@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Visualisation</title>
+        <link href="fonts.css" media="all" rel="stylesheet" type="text/css">
+        <style>
+        body {
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            font-family: "nta",Arial,sans-serif;
+        }
+        label {
+          font-size: 2rem;
+          text-transform: uppercase;
+          color: #828080;
+          position: absolute;
+          top: 1em;
+          transform: translateX(-50%);
+          background: rgba(255, 255, 255, 0.8);
+          padding: 0.5em;
+          border: 1px solid rgba(130, 128, 128, 0.8);
+          left: 50%;
+        }
+        #search {
+            font-size: 2rem;
+            border: 2px solid grey;
+            background: rgba(255,255,255,0.8)
+        }
+        #filter {
+            text-align: left;
+            padding: 20px;
+            position: absolute;
+            left: -340px;
+            bottom: 0;
+            width: 300px;
+            vertical-align: top;
+            top: 0;
+            border: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.8);
+            font-family: sans-serif;
+            transition: all 0.25s ease-in-out;
+        }
+        #filter.open {
+            left: 0;
+        }
+        ul {
+            line-height: 1.6;
+        }
+        svg {
+            /*margin: 2em auto;*/
+            /*border: 1px solid #aaa*/
+        }
+        #root {
+            transition: transform 0.25s ease-in-out;
+        }
+        .link,
+        .node {
+            transition: stroke 0.25s ease-in-out;
+        }
+        .node {
+            cursor: pointer;
+        }
+        .link {
+        fill: none;
+        stroke: #666;
+        stroke-width: 1.5px;
+        }
+        .link--critical {
+            stroke: hsl(0, 100%, 50%);
+        }
+        .link--critical.dimmed {
+            stroke: hsl(0, 100%, 90%);
+        }
+        .marker-end--critical {
+            fill: hsl(0, 100%, 50%);
+        }
+        .marker-end--critical--dimmed {
+            fill: hsl(0, 100%, 90%);
+        }
+        .link--depends {
+            stroke: hsl(120, 100%, 25%);
+        }
+        .link--depends.dimmed {
+            stroke: hsl(120, 42%, 71%);
+        }
+        .marker-end--depends {
+            fill: hsl(120, 100%, 25%);
+            stroke: none;
+        }
+        .marker-end--depends--dimmed {
+            fill: hsl(120, 42%, 71%);
+        }
+
+        circle {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: 1.5px;
+        }
+        .level--1 {
+            fill: hsl(39, 100%, 50%);
+        }
+        .dimmed .level--1,
+        .dimmed .level--1 ~ rect {
+            fill: hsl(39, 100%, 90%);
+        }
+        .level--2 {
+            fill: hsl(240, 100%, 50%);
+        }
+        .dimmed .level--2,
+        .dimmed .level--2 ~ rect {
+            fill: hsl(240, 100%, 90%);
+        }
+        .level--3 {
+            fill: hsl(350, 100%, 88%);
+        }
+        .dimmed .level--3,
+        .dimmed .level--3 ~ rect {
+            fill: hsl(350, 100%, 98%);
+        }
+        text {
+            fill: hsl(0, 0%, 0%);
+            font: 10px sans-serif;
+            pointer-events: none;
+        }
+        .level--1 ~ text {
+            fill: black;
+        }
+        .level--2 ~ text {
+            fill: white;
+        }
+        .level--3 ~ text {
+            fill: black;
+        }
+        .dimmed text {
+            opacity: 0.5;
+        }
+
+        .level--1 ~ rect {
+            fill: hsl(39, 100%, 50%);
+        }
+        .level--2 ~ rect {
+            fill: hsl(240, 100%, 50%);
+        }
+        .level--3 ~ rect {
+            fill: hsl(350, 100%, 88%);
+        }
+
+        </style>
+
+    </head>
+    <body>
+        <label>Search <input type="text" id="search" /></label>
+        <div id="filter">
+
+        </div>
+
+
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <script src="http://d3js.org/d3.v3.js"></script>
+        <script src="d3.hexbin.min.js"></script>
+        <!-- <script src="viz-seperate-json.js"></script> -->
+        <script src="viz-labels.js"></script>
+    </body>
+</html>

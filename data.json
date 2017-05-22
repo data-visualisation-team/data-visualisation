@@ -1,0 +1,30 @@
+{"relationships":[
+    {"source": "HMRC", "target": "Dept1", "value": "0.1", "rel": "depends"},
+    {"source": "HMRC", "target": "Dept2", "value": "0.1", "rel": "depends"},
+    {"source": "HMRC", "target": "Dept3", "value": "0.1", "rel": "depends"},
+    {"source": "HMRC", "target": "Dept4", "value": "0.1", "rel": "depends"},
+    
+    {"source": "Dept1", "target": "Project1", "value": "0.2", "rel": "depends"},
+    {"source": "Dept1", "target": "Project2", "value": "0.2", "rel": "depends"},
+    {"source": "Dept1", "target": "Project3", "value": "0.2", "rel": "depends"},
+    
+    {"source": "Dept2", "target": "Project4", "value": "0.2", "rel": "critical"},
+    {"source": "Dept2", "target": "Project5", "value": "0.2", "rel": "depends"},
+    {"source": "Dept2", "target": "Project6", "value": "0.2", "rel": "depends"},
+    {"source": "Dept2", "target": "Project7", "value": "0.2", "rel": "depends"},
+    {"source": "Dept2", "target": "Project8", "value": "0.2", "rel": "depends"},
+    
+    {"source": "Dept3", "target": "Project1", "value": "0.2", "rel": "depends"},
+    {"source": "Dept3", "target": "Project9", "value": "0.2", "rel": "depends"},
+    {"source": "Dept3", "target": "Project10", "value": "0.2", "rel": "depends"},
+    {"source": "Dept3", "target": "Project11", "value": "0.2", "rel": "depends"},
+    {"source": "Dept3", "target": "Project12", "value": "0.2", "rel": "depends"},
+    {"source": "Dept3", "target": "Project13", "value": "0.2", "rel": "depends"},
+    
+    {"source": "Dept4", "target": "Project14", "value": "0.2", "rel": "depends"},
+    {"source": "Dept4", "target": "Project15", "value": "0.2", "rel": "critical"},
+    {"source": "Dept4", "target": "Project16", "value": "0.2", "rel": "depends"},
+    {"source": "Dept4", "target": "Project17", "value": "0.2", "rel": "depends"},
+    {"source": "Dept4", "target": "Project18", "value": "0.2", "rel": "depends"},
+    {"source": "Dept4", "target": "Project19", "value": "0.2", "rel": "depends"}
+]}
