@@ -10,22 +10,41 @@
             margin: 0;
             font-family: "nta",Arial,sans-serif;
         }
-        label {
+        button {
+          background: #000;
+          color: #fff;
+          border: none;
+          font-size: 1.2rem;
+          margin: 0.5rem;
+        }
+        #close {
+          background: none;
+          border: none;
+          position: absolute;
+          top: 0.5rem;
+          right: 0.5rem;
+        }
+        #controls {
+          position: absolute;
+          top: 0;
+          right: 0;
+          border: 1px solid rgba(130, 128, 128, 0.8);
+          background: rgba(255, 255, 255, 0.8);
+          padding: 0.5em;
+          width: 300px;
+          border-right-width: 0;
+          border-top-width: 0;
+        }
+        #controls__search {
           font-size: 2rem;
           text-transform: uppercase;
           color: #828080;
-          position: absolute;
-          top: 1em;
-          transform: translateX(-50%);
-          background: rgba(255, 255, 255, 0.8);
-          padding: 0.5em;
-          border: 1px solid rgba(130, 128, 128, 0.8);
-          left: 50%;
         }
         #search {
             font-size: 2rem;
             border: 2px solid grey;
-            background: rgba(255,255,255,0.8)
+            background: rgba(255,255,255,0.8);
+            width: 7em;
         }
         #filter {
             text-align: left;
@@ -44,6 +63,16 @@
         #filter.open {
             left: 0;
         }
+        .control-group {
+          display: flex;
+          justify-content: space-around;
+          font-size: 1.2rem;
+          padding-top: 1em;
+        }
+        input[type="radio"] {
+            display: inline-block;
+        }
+
         ul {
             line-height: 1.6;
         }
@@ -70,26 +99,32 @@
             stroke: hsl(0, 100%, 50%);
         }
         .link--critical.dimmed {
-            stroke: hsl(0, 100%, 90%);
+            stroke: hsla(0, 100%, 95%, 0.5);
         }
-        .marker-end--critical {
+        /*.marker-end--critical {
             fill: hsl(0, 100%, 50%);
         }
         .marker-end--critical--dimmed {
             fill: hsl(0, 100%, 90%);
-        }
+        }*/
         .link--depends {
             stroke: hsl(120, 100%, 25%);
         }
         .link--depends.dimmed {
-            stroke: hsl(120, 42%, 71%);
+            stroke: hsla(120, 83%, 95%, 0.5);
         }
-        .marker-end--depends {
+        /*.marker-end--depends {
             fill: hsl(120, 100%, 25%);
             stroke: none;
         }
         .marker-end--depends--dimmed {
             fill: hsl(120, 42%, 71%);
+        }*/
+        .link--limited {
+            stroke: hsl(216, 99%, 50%);
+        }
+        .link--limited.dimmed {
+            stroke: hsla(216, 99%, 95%, 0.5);
         }
 
         circle {
@@ -100,43 +135,60 @@
         .level--1 {
             fill: hsl(39, 100%, 50%);
         }
-        .dimmed .level--1,
-        .dimmed .level--1 ~ rect {
-            fill: hsl(39, 100%, 90%);
+
+        .dimmed .level--1 {
+            fill: hsla(39, 100%, 90%, 0.5);
         }
         .level--2 {
             fill: hsl(240, 100%, 50%);
         }
-        .dimmed .level--2,
-        .dimmed .level--2 ~ rect {
-            fill: hsl(240, 100%, 90%);
+        .dimmed .level--2 {
+            fill: hsla(240, 100%, 90%, 0.5);
         }
         .level--3 {
             fill: hsl(350, 100%, 88%);
         }
-        .dimmed .level--3,
-        .dimmed .level--3 ~ rect {
-            fill: hsl(350, 100%, 98%);
+        .dimmed .level--3 {
+            fill: hsla(350, 100%, 98%, 0.5);
         }
         text {
             fill: hsl(0, 0%, 0%);
-            font: 10px sans-serif;
+            font: 12px "nta",Arial,sans-serif;
             pointer-events: none;
+            opacity: 1;
+            /*transition-delay: 2s;*/
+            transition: opacity 0.25s ease-in-out;
         }
         .level--1 ~ text {
             fill: black;
         }
         .level--2 ~ text {
-            fill: white;
+            fill: black;
         }
         .level--3 ~ text {
             fill: black;
         }
+        svg.hide-labels--level1 .level--1 ~ text {
+          opacity: 0;
+        }
+        svg.hide-labels--level2 .level--2 ~ text {
+          opacity: 0;
+        }
+        svg.hide-labels--level3 .level--3 ~ text {
+          opacity: 0;
+        }
         .dimmed text {
-            opacity: 0.5;
+            opacity: 0;
+        }
+        .node:hover text,
+        .dimmed:hover text {
+          opacity: 1!important;
+        }
+        .hidden {
+          opacity: 0;
         }
 
-        .level--1 ~ rect {
+        /*.level--1 ~ rect {
             fill: hsl(39, 100%, 50%);
         }
         .level--2 ~ rect {
@@ -144,17 +196,144 @@
         }
         .level--3 ~ rect {
             fill: hsl(350, 100%, 88%);
-        }
+        }*/
 
+.node--inplay circle {
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+.node--inplay .level--1 {
+  animation-name: pulsebg1;
+  fill: hsla(39, 100%, 50%, 0.8);
+}
+.node--inplay .level--2 {
+  animation-name: pulsebg2;
+  fill: hsla(240, 100%, 50%, 0.8);
+}
+.node--inplay .level--3 {
+  animation-name: pulsebg3;
+  fill: hsla(350, 100%, 88%, 0.8);
+}
+@keyframes pulsebg1 {
+    0% {
+        r: 20;
+        fill: hsla(39, 100%, 50%, 0.8);
+    }
+    5% {
+        r: 18;
+        fill: hsla(39, 100%, 50%, 0.4);
+    }
+    20% {
+        r: 22;
+        fill: hsla(39, 100%, 50%, 0.6);
+    }
+    30% {
+        r: 20;
+        fill: hsla(39, 100%, 50%, 0.8);
+    }
+    31%,100% {
+        r: 20;
+        fill: hsla(39, 100%, 50%, 0.8);
+    }
+}
+@keyframes pulsebg2 {
+    0% {
+        r: 12;
+        fill: hsla(240, 100%, 50%, 0.8);
+    }
+    5% {
+        r: 10;
+        fill: hsla(240, 100%, 50%, 0.4);
+    }
+    20% {
+        r: 14;
+        fill: hsla(240, 100%, 50%, 0.6);
+    }
+    30% {
+        r: 12;
+        fill: hsla(240, 100%, 50%, 0.8);
+    }
+    31%,100% {
+        r: 12;
+        fill: hsla(240, 100%, 50%, 0.8);
+    }
+}
+@keyframes pulsebg3 {
+    0% {
+        r: 11;
+        fill: hsla(350, 100%, 88%, 0.8);
+    }
+    5% {
+        r: 9;
+        fill: hsla(350, 100%, 88%, 0.4);
+    }
+    20% {
+        r: 13;
+        fill: hsla(350, 100%, 88%, 0.6);
+    }
+    30% {
+        r: 11;
+        fill: hsla(350, 100%, 88%, 0.8);
+    }
+    31%,100% {
+        r: 11;
+        fill: hsla(350, 100%, 88%, 0.8);
+    }
+}
         </style>
 
     </head>
     <body>
-        <label>Search <input type="text" id="search" /></label>
-        <div id="filter">
+        <div id="controls">
+          <form id="controls__search" action="" method="get">
+            <label>Search <input autocomplete="off" type="text" id="search" /></label>
+          </form>
+          <fieldset class="control-group" id="controls__refine">
+            <legend>Show relationships</legend>
+            <label class="refine__refiner">
+              All <input type="radio" name="refine" id="refine__all" value="all" checked>
+            </label>
+            <label class="refine__refiner">
+              Critical <input type="radio" name="refine" id="refine__critical" value="critical">
+            </label>
+            <label class="refine__refiner">
+              Depends <input type="radio" name="refine" id="refine__depends" value="depends">
+            </label>
+            <label class="refine__refiner">
+              Limited <input type="radio" name="refine" id="refine__none" value="limited">
+            </label>
+          </fieldset>
+          <fieldset class="control-group" id="controls__labels">
+            <legend>Show labels</legend>
+            <label class="labels__option">
+              Level 1 <input type="checkbox" name="labels" id="labels__level1" value="1">
+            </label>
+            <label class="labels__option">
+              Level 2 <input type="checkbox" name="labels" id="labels__level2" value="2">
+            </label>
+            <label class="labels__option">
+              Level 3 <input type="checkbox" name="labels" id="labels__level3" value="3">
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Navigate top level</legend>
+            <button id="prev">Prev</button>
+            <button id="next">Next</button>
+          </fieldset>
+          <div id="controls__other">
+            <button id="resetZoom">Reset zoom</button>
 
+            <!-- <div id="controls__prevNextLevel1"> -->
+
+            <!-- </div> -->
+          </div>
         </div>
 
+        <div id="filter">
+            <button id="close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg></button>
+            <div id="filter__inner">
+            </div>
+        </div>
 
         <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="http://d3js.org/d3.v3.js"></script>
