@@ -8,7 +8,9 @@
 
   var min_zoom = 0.1;
   var max_zoom = 7;
-  var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom]).scale(1);
+  var baseScale = 0.4;
+  var zoomScale = 1;
+  var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom]).scale(baseScale);
   var width = 1200;
   var height = 800;
   var scrollbarWidth = 15;
@@ -309,7 +311,7 @@ var force = d3.layout.force()
       .attr("width", w)
       .attr("height", h)
       .attr("class", "hide-labels--level1 hide-labels--level2 hide-labels--level3");
-  var rootg = svg.append("g").attr('id', 'root').attr("transform", "translate(" + w/4 + "," + h/4 + ") scale(0.5)");
+  var rootg = svg.append("g").attr('id', 'root').attr("transform", "translate(" + w/4 + "," + h/4 + ") scale(" + baseScale + ")");
 
   // add the links
   var path = rootg.append("svg:g").selectAll("path")
@@ -598,9 +600,9 @@ var updateNode = function() {
       if(!n){
         dcx = (w/4)
         dcy = (h/4)
-        scale = 0.5
+        scale = baseScale
       }else{
-        scale = 1
+        scale = zoomScale
         dcx = (w/2-n.x*scale)
         dcy = (h/2-n.y*scale)
       }
