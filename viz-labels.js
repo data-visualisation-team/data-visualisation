@@ -11,7 +11,8 @@
   var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom]).scale(1);
   var width = 1200;
   var height = 800;
-  var w = window.innerWidth;
+  var scrollbarWidth = 15;
+  var w = window.innerWidth - scrollbarWidth;
   var h = window.innerHeight;
   var textLvl1X = 22;
   var nodeLvl1R = 20;
@@ -199,18 +200,26 @@ function showLink(link){
   $("#link-" + link.source.id + "-" + link.target.id).removeClass('dimmed');
 }
 
-function showBranch(relLink){
+function showBranch(relLink, boolDirDown){
   //show the link and its endpoints
   showNode(relLink.source.id)
   showNode(relLink.target.id)
   showLink(relLink)
 
-  //if the source is not top level then go up until it is
-  //find links which have relLink.source as the target
-  var upstream = links.filter(function(link){return link.target.id == relLink.source.id});
-  upstream.forEach(function(ups){
-    showBranch(ups)
-  })
+  if(boolDirDown){
+    // go down the tree
+    var downstream = links.filter(function(link){return link.source.id == relLink.target.id});
+    downstream.forEach(function(downs){
+      showBranch(downs, boolDirDown)
+    })
+  } else {
+    //if the source is not top level then go up until it is
+    //find links which have relLink.source as the target
+    var upstream = links.filter(function(link){return link.target.id == relLink.source.id});
+    upstream.forEach(function(ups){
+      showBranch(ups)
+    })
+  }
 }
 function hideInPlay(){
   //remove inplay
@@ -465,7 +474,7 @@ var updateNode = function() {
     // ===================================
     d3.select(window).on("resize", resize);
     function resize() {
-        var width = window.innerWidth, height = window.innerHeight;
+        var width = window.innerWidth - scrollbarWidth, height = window.innerHeight;
         svg.attr("width", width).attr("height", height);
 
         force.size([force.size()[0]+(width-w)/zoom.scale(),force.size()[1]+(height-h)/zoom.scale()]).resume();
@@ -587,13 +596,13 @@ var updateNode = function() {
     function zoomToNode(n){
       var dcx, dcy, scale;
       if(!n){
-        dcx = (window.innerWidth/4)
-        dcy = (window.innerHeight/4)
+        dcx = (w/4)
+        dcy = (h/4)
         scale = 0.5
       }else{
         scale = 1
-        dcx = (window.innerWidth/2-n.x*scale)
-        dcy = (window.innerHeight/2-n.y*scale)
+        dcx = (w/2-n.x*scale)
+        dcy = (h/2-n.y*scale)
       }
       zoom.translate([dcx,dcy]);
       rootg.attr("transform", "translate("+ dcx + "," + dcy  + ") scale(" + scale + ")");
@@ -644,6 +653,7 @@ function showNode(nodeID){
 
 function showNodeGroup(nodeID){
   if(nodeID > ""){
+
       $('[data-to="' + nodeID + '"]').each(function(){
           var toHereList = links.filter(function(link){return link.target.id == nodeID})
           toHereList.forEach(function(toHere){
@@ -655,12 +665,10 @@ function showNodeGroup(nodeID){
           var fromHereList = links.filter(function(link){return link.source.id == nodeID})
           fromHereList.forEach(function(fromHere){
               //console.log(fromHere);
-              showBranch(fromHere)
+              showBranch(fromHere, true)
           })
 
       })
-
-
 
       // $('#' + nodeID + ', [data-from="' + nodeID + '"], [data-to="' + nodeID + '"]').each(function(){
       //     $(this).removeClass('dimmed');
