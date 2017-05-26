@@ -24,6 +24,7 @@
   var nodeLvl3R = 11;
   var paddingLeftRight = 12; // adjust the padding values depending on font and font size
   var paddingTopBottom = 5;
+  var force, svg, rootg, path, node, nodeLvl1, nodeLvl2, nodeLvl3;
   // var nominal_stroke = 1.5;
   // var nominal_base_node_size = 8;
   // var nominal_text_size = 10;
@@ -35,14 +36,14 @@
 // ===================================
 // adding dummy nodes
 // ===================================
-  var level1Count = 10;
-  var level2Count = 200;
-  var level3Count = 400;
+function generateRandomData(){
+  var level1Count = 1;
+  var level2Count = 20;
+  var level3Count = 40;
 
   function addLevel1(){
     for(i=0;i<(level1Count);i++){
         nodes.push({"id": '' + i + '', "label": "Stream " + i, "level": "1", "summary": "Lorem ipsum dolor sit amet, ad eos consetetur incorrupte. Sit facilisis explicari ex, te has alia melius labitur. Volumus sententiae consequuntur an mei."})
-        //console.log(i);
         if(i == (level1Count -1)){
           addLevel2()
         }
@@ -53,7 +54,6 @@
     //console.log('level2 =================' + l);
     for(i=(l);i<(l + level2Count);i++){
         nodes.push({"id": '' + i + '', "label": "Programme " + i, "level": "2", "summary": "Accusam iudicabit theophrastus ei nam, nisl choro ius in, pri tollit scripserit appellantur id."})
-        //console.log(l);
         if(i == (l + (level2Count - 1))){
           addLevel3()
         }
@@ -64,12 +64,116 @@
     for(i=(l);i<(l + level3Count);i++){
         nodes.push({"id": '' + i + '', "label": "Milestone " + i, "level": "3", "summary": "Usu putent vocent appetere ut, at ullum pericula vix. Utinam eirmod in vix, invidunt oporteat ei vim, an habemus adipiscing eam."})
     }
+    assignNodeLevels()
+
+    nodeLvl3.forEach(function(node){
+      var target = nodeLvl2[Math.floor(Math.random()*nodeLvl2.length)];
+      links.push({"source": parseInt(target.id), "target": parseInt(node.id), "rel": getLinkType(node.id)})
+    })
+    nodeLvl2.forEach(function(node){
+      var target = nodeLvl1[Math.floor(Math.random()*nodeLvl1.length)];
+      links.push({"source": parseInt(target.id), "target": parseInt(node.id), "rel": getLinkType(node.id)})
+    })
+    startGraph()
   }
   addLevel1()
 
-nodes.forEach(function(n){
-  $('#nodesList').append('<option value="' + n.label + '"></option>')
-})
+  // ===================================
+  // add dummy links
+  // ===================================
+
+
+
+}
+//generateRandomData()
+
+function generateTestData(){
+  nodes.push({"ref": "one", "label": "Stream one", "level": "1", "summary": "Usu putent vocent appetere ut, at ullum pericula vix. Utinam eirmod in vix, invidunt oporteat ei vim, an habemus adipiscing eam."})
+  nodes.push({"ref": "two", "label": "Project two", "level": "2", "summary": "Usu putent vocent appetere ut, at ullum pericula vix. Utinam eirmod in vix, invidunt oporteat ei vim, an habemus adipiscing eam."})
+  nodes.push({"ref": "three", "label": "Milestone three", "level": "3", "summary": "Usu putent vocent appetere ut, at ullum pericula vix. Utinam eirmod in vix, invidunt oporteat ei vim, an habemus adipiscing eam."})
+  nodes.push({"ref": "four", "label": "Milestone four", "level": "3", "summary": "Usu putent vocent appetere ut, at ullum pericula vix. Utinam eirmod in vix, invidunt oporteat ei vim, an habemus adipiscing eam."})
+
+
+
+  links.push({"source": "one", "target": "two", "rel": "depends"})
+  links.push({"source": "two", "target": "three", "rel": "depends"})
+  links.push({"source": "two", "target": "four", "rel": "depends"})
+
+  var nodeMap = {};
+  nodes.forEach(function(x) { nodeMap[x.ref] = x; });
+  links = links.map(function(x) {
+    return {
+      source: nodeMap[x.source],
+      target: nodeMap[x.target],
+      rel: x.rel
+    };
+  });
+
+  assignNodeLevels()
+  startGraph()
+}
+//generateTestData()
+
+function getAPIdata(){
+  var nodesData = false;
+  var linksData = false;
+   $.get('/nodes', function(data){
+       nodes = data
+       nodesData = true;
+
+       console.log(nodes)
+  })
+
+  $.get('/links', function(data){
+      links = data
+      linksData = true;
+  })
+
+  waitForData()
+
+  function waitForData(){
+     if(nodesData && linksData){
+       console.log(nodes, links)
+
+       var nodeMap = {};
+       nodes.forEach(function(x) { nodeMap[x.id] = x; });
+       links = links.map(function(x) {
+         return {
+           source: nodeMap[x.source],
+           target: nodeMap[x.target],
+           rel: x.rel
+         };
+       });
+
+      //  console.log(JSON.stringify(nodes))
+      //  console.log(JSON.stringify(links))
+      console.log(nodes, links)
+
+       assignNodeLevels()
+       startGraph()
+     } else {
+       setTimeout(waitForData, 100)
+     }
+   }
+
+ }
+
+//api
+getAPIdata();
+
+
+function assignNodeLevels(){
+  nodeLvl1 = nodes.filter(function(node){
+      return node.level == "1"
+  })
+  nodeLvl2 = nodes.filter(function(node){
+      return node.level == "2"
+  })
+  nodeLvl3 = nodes.filter(function(node){
+      return node.level == "3"
+  })
+}
+
 
 function getLinkType(n){
   n = parseInt(n)
@@ -83,29 +187,7 @@ function getLinkType(n){
 }
 
 
-// ===================================
-// add dummy links
-// ===================================
-  var nodeLvl1 = nodes.filter(function(node){
-      return node.level == "1"
-  })
-  var nodeLvl2 = nodes.filter(function(node){
-      return node.level == "2"
-  })
-  var nodeLvl3 = nodes.filter(function(node){
-      return node.level == "3"
-  })
 
-  nodeLvl3.forEach(function(node){
-    var target = nodeLvl2[Math.floor(Math.random()*nodeLvl2.length)];
-    links.push({"source": parseInt(target.id), "target": parseInt(node.id), "rel": getLinkType(node.id)})
-  })
-  nodeLvl2.forEach(function(node){
-    var target = nodeLvl1[Math.floor(Math.random()*nodeLvl1.length)];
-    links.push({"source": parseInt(target.id), "target": parseInt(node.id), "rel": getLinkType(node.id)})
-  })
-  // make sure we only have unique links as we are generating them randomly
-  //links = links.filter((link, index, self) => self.findIndex((t) => {return t.source === link.source && t.target === link.target; }) === index)
 
 
 // ===================================
@@ -272,7 +354,34 @@ function reset(){
 // ===================================
 // start node/link force layout
 // ===================================
-var force = d3.layout.force()
+
+
+function startGraph(){
+
+
+  nodes.forEach(function(n){
+    $('#nodesList').append('<option value="' + n.label + '"></option>')
+  })
+
+  // var edges = [];
+  // links.forEach(function(e) {
+  //     var sourceNode = nodes.filter(function(n) {
+  //         return n.Id === e.Source;
+  //     })[0],
+  //         targetNode = nodes.filter(function(n) {
+  //             return n.Id === e.Target;
+  //         })[0];
+  //
+  //     edges.push({
+  //         source: sourceNode,
+  //         target: targetNode,
+  //         value: e.Value
+  //     });
+  // });
+  // console.log(edges)
+  // links = edges
+
+  force = d3.layout.force()
     .nodes(nodes)
     .links(links)
     .size([w, h])
@@ -285,39 +394,17 @@ var force = d3.layout.force()
     //.on("tick", tick)
     .start();
 
-
-// ===================================
-// start label force layout
-// ===================================
-//   var force2 = d3.layout.force()
-//     .nodes(labelAnchors)
-//     .links(labelAnchorLinks)
-//     .gravity(0)
-//     .linkDistance(0)
-//     .linkStrength(8)
-//     .charge(-100)
-//     .size([w, h])
-//     .on('start', start2);
-//
-// setTimeout(function(){
-//     force2.start();
-// }, 15000)
-
-
-
-
-
 // ===================================
 // construct the svg
 // ===================================
-  var svg = d3.select("body").append("svg")
+  svg = d3.select("body").append("svg")
       .attr("width", w)
       .attr("height", h)
       .attr("class", "hide-labels--level1 hide-labels--level2 hide-labels--level3");
-  var rootg = svg.append("g").attr('id', 'root').attr("transform", "translate(" + w/4 + "," + h/4 + ") scale(" + baseScale + ")");
+  rootg = svg.append("g").attr('id', 'root').attr("transform", "translate(" + w/4 + "," + h/4 + ") scale(" + baseScale + ")");
 
   // add the links
-  var path = rootg.append("svg:g").selectAll("path")
+  path = rootg.append("svg:g").selectAll("path")
       .data(force.links())
     .enter().append("svg:path")
       .attr("class", function(d) { return "link link--" + d.rel; })
@@ -325,7 +412,7 @@ var force = d3.layout.force()
       .attr("data-from", function(d) {return d.source.id})
       .attr("data-to", function(d) {return d.target.id})
   // add the nodes
-  var node = rootg.selectAll(".node")
+  node = rootg.selectAll(".node")
       .data(force.nodes())
     .enter().append("g")
       .attr("class", "node")
@@ -359,20 +446,47 @@ var force = d3.layout.force()
       .attr("dy", 5 + (paddingTopBottom/2))
       .attr("class", function(d){ return "text text--lvl" + d.level})
       .text(function(d) { return d.label; });
-  // add the label anchor nodes
-  // var anchorNode = rootg.selectAll("g.anchorNode")
-  //     .data(force2.nodes())
-  //     .enter().append("svg:g")
-  //     .attr("class", "anchorNode");
-  //     anchorNode.append("svg:circle")
-  //         .attr("r", 3)
-  //         .style("fill", "#990");
-  // add the labels
-      // anchorNode.append("svg:text")
-      //     .text(function(d, i) {return i % 2 == 0 ? "" : d.node.label})
+
+
+  // ===================================
+  // handle mousewheel/doubleclick zoom
+  // ===================================
+  zoom.on("zoom", function() {
+      console.log(d3.event.scale)
+      rootg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  });
+  svg.call(zoom);
+
+
+  // ===================================
+  // resize the svg element based on viewport size
+  // ===================================
+  d3.select(window).on("resize", resize);
+  function resize() {
+      var width = window.innerWidth - scrollbarWidth, height = window.innerHeight;
+      svg.attr("width", width).attr("height", height);
+
+      force.size([force.size()[0]+(width-w)/zoom.scale(),force.size()[1]+(height-h)/zoom.scale()]).resume();
+      w = width;
+      h = height;
+  }
+  resize();
 
 
 
+  // ===================================
+  // highlight node on click
+  // ===================================
+  node.on('click', function(d){
+      d3.event.stopPropagation();
+      clickNode(d)
+  })
+
+  node.on("dblclick.zoom", function(d) { d3.event.stopPropagation();
+  //     zoomToNode(d)
+  });
+
+}
 // ===================================
 // control rendering
 // ===================================
@@ -382,7 +496,6 @@ function start() {
     for (var i = 0; i < ticksPerRender; i++) {
       force.tick();
     }
-    //force2.start();
 
     // links
     path.attr("d", function(d) {
@@ -413,44 +526,6 @@ function start() {
 }
 
 
-// function tick() {
-//     force2.start();
-//
-//     // links
-//     path.attr("d", function(d) {
-//         var dx = d.target.x - d.source.x,
-//             dy = d.target.y - d.source.y,
-//             dr = 0;//Math.sqrt(dx * dx + dy * dy);
-//         return "M" +
-//             d.source.x + "," +
-//             d.source.y + "A" +
-//             dr + "," + dr + " 0 0,1 " +
-//             d.target.x + "," +
-//             d.target.y;
-//     });
-//
-//     // nodes
-//     node.call(updateNode);
-//
-//     // labels
-//     anchorNode.each(function(d, i) {
-//   			if(i % 2 == 0) {
-//   				d.x = d.node.x;
-//   				d.y = d.node.y;
-//   			} else {
-//   				var b = this.childNodes[1].getBBox();
-//   				var diffX = d.x - d.node.x;
-//   				var diffY = d.y - d.node.y;
-//   				var dist = Math.sqrt(diffX * diffX + diffY * diffY);
-//   				var shiftX = b.width * (diffX - dist) / (dist * 2);
-//   				shiftX = Math.max(-b.width, Math.min(0, shiftX));
-//   				var shiftY = 6;
-//   				this.childNodes[1].setAttribute("transform", "translate(" + shiftX + "," + shiftY + ")");
-//   			}
-// 		});
-// 		anchorNode.call(updateNode);
-// }
-
 var updateNode = function() {
     this.attr("transform", function(d) {
       return "translate(" + d.x + "," + d.y + ")";
@@ -465,30 +540,23 @@ var updateNode = function() {
 // ===================================
 
 
-    // ===================================
-    // handle mousewheel/doubleclick zoom
-    // ===================================
-    zoom.on("zoom", function() {
-        console.log(d3.event.scale)
-        rootg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-    });
-    svg.call(zoom);
 
+function clickNode(d){
+    reset()
+    var el = $('#' + d.id);
+    if(el.hasClass('node--inplay')){
+        el.removeClass('node--inplay');
+        showNodeGroup()
+        updateFilter()
+    } else {
+        hideNodes()
+        $('.node--inplay').removeClass('node--inplay')
+        el.addClass('node--inplay');
 
-    // ===================================
-    // resize the svg element based on viewport size
-    // ===================================
-    d3.select(window).on("resize", resize);
-    function resize() {
-        var width = window.innerWidth - scrollbarWidth, height = window.innerHeight;
-        svg.attr("width", width).attr("height", height);
-
-        force.size([force.size()[0]+(width-w)/zoom.scale(),force.size()[1]+(height-h)/zoom.scale()]).resume();
-        w = width;
-        h = height;
+        showNodeGroup(d.id)
+        showData(d)
     }
-    resize();
-
+}
 
 
     // ===================================
@@ -533,29 +601,7 @@ var updateNode = function() {
 
 
 
-    // ===================================
-    // highlight node on click
-    // ===================================
-    node.on('click', function(d){
-        d3.event.stopPropagation();
-        clickNode(d)
-    })
-    function clickNode(d){
-        reset()
-        var el = $('#' + d.id);
-        if(el.hasClass('node--inplay')){
-            el.removeClass('node--inplay');
-            showNodeGroup()
-            updateFilter()
-        } else {
-            hideNodes()
-            $('.node--inplay').removeClass('node--inplay')
-            el.addClass('node--inplay');
 
-            showNodeGroup(d.id)
-            showData(d)
-        }
-    }
 
 
 
@@ -576,9 +622,7 @@ var updateNode = function() {
     // ===================================
     // centre view on node when double-clicked
     // ===================================
-    node.on("dblclick.zoom", function(d) { d3.event.stopPropagation();
-    //     zoomToNode(d)
-    });
+
     $('body').on('click', '#zoomToNode', function(e){
       e.preventDefault();
       var n = [];

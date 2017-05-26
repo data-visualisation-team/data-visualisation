@@ -33,8 +33,18 @@ app.get('/nodes', (req, res) => {
     spreadsheetId,
     range: 'nodes!nodes_all'
   }, (err, response) => {
-    var data = response.values.map(([id, name]) => ({ id, name }))
-    data.shift()
+    //var data = response.values.map(([id, label, level, summary]) => ({ id, label, level, summary }))
+
+    var data = []
+    var tmp = response.values
+    console.log(tmp)
+    tmp.forEach(function(v){
+      data.push({"id": parseInt(v[0]), "label": v[1], "level": v[2], "summary": v[3]})
+    })
+    console.log(data)
+
+
+    //data.shift()
     res.send(data)
   })
 })
@@ -43,8 +53,16 @@ app.get('/links', (req, res) => {
     spreadsheetId,
     range: 'links!links_all'
   }, (err, response) => {
-    var data = response.values.map(([id, source, target, rel]) => ({ id, source, target, rel }))
-    data.shift()
+
+    //var data = response.values.map(([source, target, rel]) => ({ source, target, rel }))
+    var data = []
+    var tmp = response.values
+    console.log(tmp)
+    tmp.forEach(function(v){
+      data.push({"ref":parseInt(v[0]), "source": parseInt(v[1]), "target": parseInt(v[2]), "rel": v[3]})
+    })
+    console.log(data)
+
     res.send(data)
   })
 })
