@@ -67,6 +67,9 @@
   }
   addLevel1()
 
+nodes.forEach(function(n){
+  $('#nodesList').append('<option value="' + n.label + '"></option>')
+})
 
 function getLinkType(n){
   n = parseInt(n)
@@ -466,6 +469,7 @@ var updateNode = function() {
     // handle mousewheel/doubleclick zoom
     // ===================================
     zoom.on("zoom", function() {
+        console.log(d3.event.scale)
         rootg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     });
     svg.call(zoom);

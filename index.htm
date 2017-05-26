@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Visualisation</title>
-        <link href="fonts.css" media="all" rel="stylesheet" type="text/css">
+        <link href="/fonts.css" media="all" rel="stylesheet" type="text/css">
         <style>
         body {
             text-align: center;
@@ -286,7 +286,9 @@
     <body>
         <div id="controls">
           <form id="controls__search" action="" method="get">
-            <label>Search <input autocomplete="off" type="text" id="search" /></label>
+            <label>Search <input list="nodesList" autocomplete="off" type="text" id="search" /></label>
+            <datalist id="nodesList">
+            </datalist>
           </form>
           <fieldset class="control-group" id="controls__refine">
             <legend>Show relationships</legend>
@@ -337,8 +339,8 @@
 
         <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="http://d3js.org/d3.v3.js"></script>
-        <script src="d3.hexbin.min.js"></script>
+        <!-- <script src="d3.hexbin.min.js"></script> -->
         <!-- <script src="viz-seperate-json.js"></script> -->
-        <script src="viz-labels.js"></script>
+        <script src="/viz-labels.js"></script>
     </body>
 </html>
