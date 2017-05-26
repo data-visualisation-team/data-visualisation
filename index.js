@@ -26,6 +26,7 @@ const sheets = google.sheets('v4')
 
 const spreadsheetId = '1AzQNpubGt2L5T8fSEkGwsjfQkNk5xbCDiIkOeVQ5Ng0'
 
+var port = process.env.PORT || 8080;
 
 app.get('/nodes', (req, res) => {
   sheets.spreadsheets.values.get({
@@ -53,4 +54,4 @@ app.get('/', function(req, res){
 app.use(express.static('public'))
 
 
-app.listen(5000)
+app.listen(port)
