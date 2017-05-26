@@ -4,11 +4,15 @@
         <title>Visualisation</title>
         <link href="/fonts.css" media="all" rel="stylesheet" type="text/css">
         <style>
+        * {
+          box-sizing: border-box;
+        }
         body {
             text-align: center;
             padding: 0;
             margin: 0;
             font-family: "nta",Arial,sans-serif;
+            overflow: hidden;
         }
         button {
           background: #000;
@@ -63,11 +67,13 @@
         #filter.open {
             left: 0;
         }
+        fieldset {
+          padding-top: 1em;
+        }
         .control-group {
           display: flex;
           justify-content: space-around;
           font-size: 1.2rem;
-          padding-top: 1em;
         }
         input[type="radio"] {
             display: inline-block;
@@ -290,32 +296,36 @@
             <datalist id="nodesList">
             </datalist>
           </form>
-          <fieldset class="control-group" id="controls__refine">
+          <fieldset id="controls__refine">
             <legend>Show relationships</legend>
-            <label class="refine__refiner">
-              All <input type="radio" name="refine" id="refine__all" value="all" checked>
-            </label>
-            <label class="refine__refiner">
-              Critical <input type="radio" name="refine" id="refine__critical" value="critical">
-            </label>
-            <label class="refine__refiner">
-              Depends <input type="radio" name="refine" id="refine__depends" value="depends">
-            </label>
-            <label class="refine__refiner">
-              Limited <input type="radio" name="refine" id="refine__none" value="limited">
-            </label>
+            <div class="control-group">
+              <label class="refine__refiner">
+                All <input type="radio" name="refine" id="refine__all" value="all" checked>
+              </label>
+              <label class="refine__refiner">
+                Critical <input type="radio" name="refine" id="refine__critical" value="critical">
+              </label>
+              <label class="refine__refiner">
+                Depends <input type="radio" name="refine" id="refine__depends" value="depends">
+              </label>
+              <label class="refine__refiner">
+                Limited <input type="radio" name="refine" id="refine__none" value="limited">
+              </label>
+            </div>
           </fieldset>
-          <fieldset class="control-group" id="controls__labels">
+          <fieldset id="controls__labels">
             <legend>Show labels</legend>
-            <label class="labels__option">
-              Level 1 <input type="checkbox" name="labels" id="labels__level1" value="1">
-            </label>
-            <label class="labels__option">
-              Level 2 <input type="checkbox" name="labels" id="labels__level2" value="2">
-            </label>
-            <label class="labels__option">
-              Level 3 <input type="checkbox" name="labels" id="labels__level3" value="3">
-            </label>
+            <div class="control-group">
+              <label class="labels__option">
+                Level 1 <input type="checkbox" name="labels" id="labels__level1" value="1">
+              </label>
+              <label class="labels__option">
+                Level 2 <input type="checkbox" name="labels" id="labels__level2" value="2">
+              </label>
+              <label class="labels__option">
+                Level 3 <input type="checkbox" name="labels" id="labels__level3" value="3">
+              </label>
+            </div>
           </fieldset>
           <fieldset>
             <legend>Navigate top level</legend>

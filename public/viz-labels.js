@@ -131,7 +131,7 @@ function getLinkType(n){
 function showData(n){
     var r = [];
     // this node
-    r.push({n});
+    r.push({"n":n});
     // get immediate parents
     r[0].parents = getTarget(n)
     // get immediate children
