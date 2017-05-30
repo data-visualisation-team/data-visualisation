@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -24,20 +25,11 @@ const sheets = google.sheets('v4')
 //   console.log(tokens)
 // })
 
-const spreadsheetId = '15MrjiiZU9X7OuwLzf5TCGnFPSTgZziIPXUZRrXHy-yA'//'1AzQNpubGt2L5T8fSEkGwsjfQkNk5xbCDiIkOeVQ5Ng0'
+const spreadsheetId = process.env.SPREADSHEETID
+//'15MrjiiZU9X7OuwLzf5TCGnFPSTgZziIPXUZRrXHy-yA'
+//'1AzQNpubGt2L5T8fSEkGwsjfQkNk5xbCDiIkOeVQ5Ng0'
 
 var port = process.env.PORT || 8080;
-
-
-// app.get('/test', (req, res) => {
-//   sheets.spreadsheets.values.get({
-//     spreadsheetId,
-//     range: 'nodes'
-//   }, (err, response) => {
-//     var tmp = response.values
-//     console.log(tmp)
-//   })
-// })
 
 app.get('/nodes', (req, res) => {
   sheets.spreadsheets.values.get({
@@ -48,13 +40,10 @@ app.get('/nodes', (req, res) => {
 
     var data = []
     var tmp = response.values
-    //console.log(tmp)
+
     tmp.forEach(function(v){
       data.push({"id": parseInt(v[0]), "label": v[1], "level": v[2], "summary": v[3]})
     })
-    //console.log(data)
-
-
     data.shift()
     res.send(data)
   })
@@ -68,13 +57,10 @@ app.get('/links', (req, res) => {
     //var data = response.values.map(([source, target, rel]) => ({ source, target, rel }))
     var data = []
     var tmp = response.values
-    //console.log(tmp)
     tmp.forEach(function(v){
-      // data.push({"ref":parseInt(v[0]), "source": parseInt(v[1]), "target": parseInt(v[2]), "rel": v[3]})
       data.push({"source": parseInt(v[0]), "target": parseInt(v[1]), "rel": v[2]})
     })
     data.shift()
-    console.log(data)
 
     res.send(data)
   })
