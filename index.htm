@@ -7,6 +7,10 @@
         * {
           box-sizing: border-box;
         }
+        :root {
+          --op: 0.5;
+          --lightness: 90%;
+        }
         body {
             text-align: center;
             padding: 0;
@@ -69,14 +73,30 @@
         }
         fieldset {
           padding-top: 1em;
+          margin: 1em 0;
         }
         .control-group {
           display: flex;
           justify-content: space-around;
           font-size: 1.2rem;
         }
-        input[type="radio"] {
-            display: inline-block;
+        input[type="radio"],
+        input[type="checkbox"] {
+          display: block;
+          margin: 0 auto;
+        }
+        #visibility {
+            position: relative;
+        }
+        #visibility:before {
+            content: "more";
+            left: -4em;
+            position: relative;
+        }
+        #visibility:after {
+            content: "less";
+            right: -4em;
+            position: relative;
         }
 
         ul {
@@ -105,32 +125,19 @@
             stroke: hsl(0, 100%, 50%);
         }
         .link--critical.dimmed {
-            stroke: hsla(0, 100%, 95%, 0.5);
+            stroke: hsla(0, 100%, var(--lightness), var(--op));
         }
-        /*.marker-end--critical {
-            fill: hsl(0, 100%, 50%);
-        }
-        .marker-end--critical--dimmed {
-            fill: hsl(0, 100%, 90%);
-        }*/
         .link--depends {
-            stroke: hsl(120, 100%, 25%);
+            stroke: hsl(0, 0%, 50%);
         }
         .link--depends.dimmed {
-            stroke: hsla(120, 83%, 95%, 0.5);
+            stroke: hsla(0, 0%, var(--lightness), var(--op));
         }
-        /*.marker-end--depends {
-            fill: hsl(120, 100%, 25%);
-            stroke: none;
-        }
-        .marker-end--depends--dimmed {
-            fill: hsl(120, 42%, 71%);
-        }*/
         .link--limited {
             stroke: hsl(216, 99%, 50%);
         }
         .link--limited.dimmed {
-            stroke: hsla(216, 99%, 95%, 0.5);
+            stroke: hsla(216, 99%, var(--lightness), var(--op));
         }
 
         circle {
@@ -141,21 +148,20 @@
         .level--1 {
             fill: hsl(39, 100%, 50%);
         }
-
         .dimmed .level--1 {
-            fill: hsla(39, 100%, 90%, 0.5);
+            fill: hsla(39, 100%, var(--lightness), var(--op));
         }
         .level--2 {
             fill: hsl(240, 100%, 50%);
         }
         .dimmed .level--2 {
-            fill: hsla(240, 100%, 90%, 0.5);
+            fill: hsla(240, 100%, var(--lightness), var(--op));
         }
         .level--3 {
-            fill: hsl(350, 100%, 88%);
+            fill: hsl(350, 100%, 50%);
         }
         .dimmed .level--3 {
-            fill: hsla(350, 100%, 98%, 0.5);
+            fill: hsla(350, 100%, var(--lightness), var(--op));
         }
         text {
             fill: hsl(0, 0%, 0%);
@@ -328,16 +334,16 @@
             </div>
           </fieldset>
           <fieldset>
+            <legend>Adjust visibilty</legend>
+            <input type="range" id="visibility" min="50" max="90" step="1">
+          </fieldset>
+          <fieldset>
             <legend>Navigate top level</legend>
             <button id="prev">Prev</button>
             <button id="next">Next</button>
           </fieldset>
           <div id="controls__other">
             <button id="resetZoom">Reset zoom</button>
-
-            <!-- <div id="controls__prevNextLevel1"> -->
-
-            <!-- </div> -->
           </div>
         </div>
 

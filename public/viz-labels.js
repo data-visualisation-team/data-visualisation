@@ -744,3 +744,18 @@ function showNodeGroup(nodeID){
 function getRand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+
+var styles = getComputedStyle(document.documentElement);
+var getVariable = function(styles, propertyName) {
+  return String(parseInt(styles.getPropertyValue(propertyName))).trim();
+};
+var setDocumentVariable = function(propertyName, value) {
+  document.documentElement.style.setProperty(propertyName, value);
+};
+var bgVisibility = document.querySelector('#visibility');
+bgVisibility.value = getVariable(styles, '--lightness');
+bgVisibility.addEventListener('input', function() {
+  setDocumentVariable('--lightness', bgVisibility.value + '%');
+  setDocumentVariable('--op', ((100 - bgVisibility.value) * 0.02));
+});
