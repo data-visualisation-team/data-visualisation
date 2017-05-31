@@ -127,10 +127,10 @@
         .link--critical.dimmed {
             stroke: hsla(0, 100%, var(--lightness), var(--op));
         }
-        .link--depends {
+        .link--contributes {
             stroke: hsl(0, 0%, 50%);
         }
-        .link--depends.dimmed {
+        .link--contributes.dimmed {
             stroke: hsla(0, 0%, var(--lightness), var(--op));
         }
         .link--limited {
@@ -312,10 +312,10 @@
                 Critical <input type="radio" name="refine" id="refine__critical" value="critical">
               </label>
               <label class="refine__refiner">
-                Depends <input type="radio" name="refine" id="refine__depends" value="depends">
+                Contributes <input type="radio" name="refine" id="refine__depends" value="contributes">
               </label>
               <label class="refine__refiner">
-                Limited <input type="radio" name="refine" id="refine__none" value="limited">
+                None <input type="radio" name="refine" id="refine__none" value="none">
               </label>
             </div>
           </fieldset>
@@ -323,13 +323,13 @@
             <legend>Show labels</legend>
             <div class="control-group">
               <label class="labels__option">
-                Level 1 <input type="checkbox" name="labels" id="labels__level1" value="1">
+                SR15 <input type="checkbox" name="labels" id="labels__level1" value="1">
               </label>
               <label class="labels__option">
-                Level 2 <input type="checkbox" name="labels" id="labels__level2" value="2">
+                Programme <input type="checkbox" name="labels" id="labels__level2" value="2">
               </label>
               <label class="labels__option">
-                Level 3 <input type="checkbox" name="labels" id="labels__level3" value="3">
+                Project <input type="checkbox" name="labels" id="labels__level3" value="3">
               </label>
             </div>
           </fieldset>

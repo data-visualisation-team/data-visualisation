@@ -121,7 +121,7 @@ function getAPIdata(){
        nodes = data
        nodesData = true;
 
-       console.log(nodes)
+      // console.log(nodes)
   })
 
   $.get('/links', function(data){
@@ -133,7 +133,7 @@ function getAPIdata(){
 
   function waitForData(){
      if(nodesData && linksData){
-       console.log(nodes, links)
+       //console.log(nodes, links)
 
        var nodeMap = {};
        nodes.forEach(function(x) { nodeMap[x.id] = x; });
@@ -147,7 +147,7 @@ function getAPIdata(){
 
       //  console.log(JSON.stringify(nodes))
       //  console.log(JSON.stringify(links))
-      console.log(nodes, links)
+      //console.log(nodes, links)
 
        assignNodeLevels()
        startGraph()
@@ -164,13 +164,13 @@ getAPIdata();
 
 function assignNodeLevels(){
   nodeLvl1 = nodes.filter(function(node){
-      return node.level == "1"
+      return node.level == "SR15"
   })
   nodeLvl2 = nodes.filter(function(node){
-      return node.level == "2"
+      return node.level == "Programme"
   })
   nodeLvl3 = nodes.filter(function(node){
-      return node.level == "3"
+      return node.level == "Project"
   })
 }
 
@@ -280,7 +280,7 @@ function updateFilter(r){
 
 // get links of particular type
 function getLinks(rel){
-  return links.filter(function(link){return link.rel == rel})
+  return links.filter(function(link){return link.rel.toLowerCase() == rel.toLowerCase()})
 }
 
 function showLink(link){
@@ -385,10 +385,10 @@ function startGraph(){
     .nodes(nodes)
     .links(links)
     .size([w, h])
-    .linkDistance(50)
+    .linkDistance(100)
     .linkStrength(function(l, i) {return 1; })  // could make this dependent on type of link
     .gravity(1)
-    .charge(-3000)
+    .charge(-10000)
     .friction(0.75)
     .on('start', start)
     //.on("tick", tick)
@@ -407,7 +407,7 @@ function startGraph(){
   path = rootg.append("svg:g").selectAll("path")
       .data(force.links())
     .enter().append("svg:path")
-      .attr("class", function(d) { return "link link--" + d.rel; })
+      .attr("class", function(d) { return "link link--" + d.rel.toLowerCase(); })
       .attr("id", function(d){ return "link-" + d.source.id + "-" + d.target.id})
       .attr("data-from", function(d) {return d.source.id})
       .attr("data-to", function(d) {return d.target.id})
@@ -420,21 +420,55 @@ function startGraph(){
       .attr("data-label", function(d){ return d.label; })
       .call(force.drag);
       node.append("circle")
-          .attr("r", function(d) { return (20 / d.level) })
-          .attr("class", function(d) { return "level--" + d.level });
+          .attr("r", function(d) {
+            var dLevel;
+            switch (d.level){
+              case "SR15":
+              dLevel = 1;
+              break;
+              case "Programme":
+              dLevel = 2;
+              break;
+              case "Project":
+              dLevel = 3;
+              break;
+              default:
+              dLevel = 4;
+              break;
+            }
+            return (20 / dLevel)
+          })
+          .attr("class", function(d) {
+            var dLevel;
+            switch (d.level){
+              case "SR15":
+              dLevel = 1;
+              break;
+              case "Programme":
+              dLevel = 2;
+              break;
+              case "Project":
+              dLevel = 3;
+              break;
+              default:
+              dLevel = 4;
+              break;
+            }
+            return "level--" + dLevel
+          });
       node.append("text")
       .attr('id', function(d) { return "text--" + (d.index);})
       //.attr('filter', function(d) { return 'url(#lvl' + d.level + ')'})
       .attr("x", function(d) {
           var xPos;
-          switch (parseInt(d.level)){
-              case 1:
+          switch (d.level){
+              case "SR15":
                xPos = textLvl1X;
               break;
-              case 2:
+              case "Programme":
                xPos = textLvl2X;
               break;
-              case 3:
+              case "Project":
                xPos = textLvl3X;
               break;
               default:
