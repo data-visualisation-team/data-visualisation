@@ -28,7 +28,10 @@
 
   var force, svg, rootg, path, node, nodeLvl1, nodeLvl2, nodeLvl3;
 
-
+  var supportsVariables = false;
+  if(window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0)){
+    supportsVariables = true;
+  }
 
 
 // ===================================
@@ -176,6 +179,7 @@ function getTarget(n){
 function updateFilter(r){
     $('#filter__inner').html("");
     $('#filter').removeClass("open");
+    disableVisibility(false);
 
     if(r == undefined) return
 
@@ -186,7 +190,7 @@ function updateFilter(r){
         t = t + '<h2>Contributes to</h2>'
         t = t + '<ul>'
         r.parents.forEach(function(p){
-            t = t + '<li><a class="filter__link" href="" data-node="' + p.source.index + '">' + p.source.label + '</a> [' + p.rel + ']</li>';
+            t = t + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + p.source.index + '"><span class="filter__action">' + p.source.label + '</span> <span class="filter__status filter__status--' + p.rel.toLowerCase() + '">' + p.rel + '</span></a></li>';
         })
         t = t + '</ul>'
     }
@@ -194,12 +198,13 @@ function updateFilter(r){
         t = t + '<h2>Supported by</h2>'
         t = t + '<ul>'
         r.children.forEach(function(c){
-            t = t + '<li><a class="filter__link" href="" data-node="' + c.target.index + '">' + c.target.label + '</a> [' + c.rel + ']</li>';
+            t = t + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + c.target.index + '"><span class="filter__action">' + c.target.label + '</span> <span class="filter__status filter__status--' + c.rel.toLowerCase() + '">' + c.rel + '</span></a></li>';
         })
         t = t + '</ul>'
     }
     $('#filter__inner').html(t);
     $('#filter').addClass("open");
+    disableVisibility(true);
     $('#zoomToNode').focus();
 }
 
@@ -261,8 +266,10 @@ function showLinks(rel){
   hideInPlay()
   if(rel == "all"){
     showNode();
+    disableVisibility(false);
   }else{
     hideNodes();
+    disableVisibility(true);
     // get all links of particular type
     var relLinks = getLinks(rel)
     //get all upstream nodes from this link
@@ -282,6 +289,20 @@ function reset(){
   updateFilter()
   //reset refine
   $('#refine__all').click();
+}
+
+
+
+// ===================================
+// disable/enable the visibility adjuster
+// ===================================
+function disableVisibility(boolOn){
+  var el = document.querySelector('#visibility');
+  if(boolOn){
+    el.removeAttribute('disabled');
+  } else {
+    el.setAttribute("disabled", "disabled");
+  }
 }
 
 
@@ -421,7 +442,12 @@ function showNodeGroup(nodeID){
 // ===================================
 // ===================================
 function startGraph(){
-  nodes.forEach(function(n){
+  var sortedNodes = nodes.sort(function(a, b) {
+      var textA = a.label.toUpperCase();
+      var textB = b.label.toUpperCase();
+      return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+  });
+  sortedNodes.forEach(function(n){
     $('#nodesList').append('<option value="' + n.label + '"></option>')
   })
 
@@ -678,6 +704,21 @@ $('#close').on('click', function(e){
 })
 
 
+// ===================================
+// key codes
+// ===================================
+$('body').on('keyup', function(e){
+  switch (e.keyCode){
+    case 27:
+    // close sidebar on ESC key
+    if($('#filter').is('.open')){
+        e.preventDefault();
+        $('#close').trigger('click')
+    }
+    break;
+  }
+})
+
 
 // ===================================
 // handle prev next controls for navigating between top level nodes
@@ -704,16 +745,23 @@ $('#next').on('click', function(e){
 // ===================================
 // handle control of css variables via slider
 // ===================================
-var styles = getComputedStyle(document.documentElement);
-var getVariable = function(styles, propertyName) {
-  return String(parseInt(styles.getPropertyValue(propertyName))).trim();
-};
-var setDocumentVariable = function(propertyName, value) {
-  document.documentElement.style.setProperty(propertyName, value);
-};
-var bgVisibility = document.querySelector('#visibility');
-bgVisibility.value = getVariable(styles, '--lightness');
-bgVisibility.addEventListener('input', function() {
-  setDocumentVariable('--lightness', bgVisibility.value + '%');
-  setDocumentVariable('--op', ((100 - bgVisibility.value) * 0.02));
-});
+if(supportsVariables){
+  var bgVisibilityWrap = document.querySelector('#controls__visibility');
+  var bgVisibility = bgVisibilityWrap.querySelector('#visibility');
+
+  bgVisibilityWrap.classList.remove('hidden');
+
+  var styles = getComputedStyle(document.documentElement);
+  var getVariable = function(styles, propertyName) {
+    return String(parseInt(styles.getPropertyValue(propertyName))).trim();
+  };
+  var setDocumentVariable = function(propertyName, value) {
+    document.documentElement.style.setProperty(propertyName, value);
+  };
+
+  bgVisibility.value = getVariable(styles, '--lightness');
+  bgVisibility.addEventListener('input', function() {
+    setDocumentVariable('--lightness', bgVisibility.value + '%');
+    setDocumentVariable('--op', ((100 - bgVisibility.value) * 0.02));
+  });
+}

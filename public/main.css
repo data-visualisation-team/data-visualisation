@@ -1,0 +1,353 @@
+* {
+  box-sizing: border-box;
+}
+:root {
+  --op: 0.5;
+  --lightness: 85%;
+}
+body {
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    font-family: "nta",Arial,sans-serif;
+    overflow: hidden;
+}
+.hidden {
+  display: none;
+}
+button {
+  background: #000;
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  margin: 0.5rem;
+}
+#close {
+  background: none;
+  border: none;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+#controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 2px solid rgba(130, 128, 128, 0.8);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.5em;
+  width: 300px;
+  border-right-width: 0;
+  border-top-width: 0;
+}
+#controls__search {
+  font-size: 2rem;
+  text-transform: uppercase;
+  color: #828080;
+}
+#search {
+    font-size: 2rem;
+    border: 2px solid grey;
+    background: rgba(255,255,255,0.8);
+    width: 7em;
+}
+#filter {
+    text-align: left;
+    padding: 20px;
+    position: absolute;
+    overflow-y: auto;
+    left: -340px;
+    bottom: 0;
+    width: 300px;
+    vertical-align: top;
+    top: 0;
+    border-right: 2px solid rgba(130, 128, 128, 0.8);
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.25s ease-in-out;
+}
+#filter.open {
+    left: 0;
+}
+#filter h1 {
+  line-height: 1.1;
+}
+.filter__entry {
+    margin-bottom: 0.5em;
+    list-style: none;
+
+}
+.filter__link {
+  display: flex;
+  background: #f6f6f6;
+  padding: 0.4em 0.2em;
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
+}
+.filter__link:hover,
+.filter__link:focus {
+  background: #ececec;
+  color: #1c1c1c;
+}
+.filter__action {
+  display: block;
+  width: 60%;
+  padding-right: 0.2em;
+}
+.filter__status {
+    width: 40%;
+    padding: 0.2em;
+    text-align: center;
+    font-size: 0.8em;
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    background: #333;
+    color: #fff;
+}
+
+.filter__status--critical {
+    background: maroon;
+    color: #fff;
+}
+.filter__status--contributes {
+    background: blue;
+    color: #fff;
+}
+fieldset {
+  padding: 0.5em 0;
+  margin: 1em 0;
+  border: 1px solid transparent;
+  border-top-color: #bbb;
+}
+legend {
+  margin: 0 auto;
+}
+.control-group {
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.2rem;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  display: block;
+  margin: 0 auto;
+}
+#visibility {
+    position: relative;
+}
+#visibility:disabled {
+  opacity: 0.2;
+}
+#visibility:before {
+    content: "more";
+    left: -4em;
+    position: relative;
+}
+#visibility:after {
+    content: "less";
+    right: -4em;
+    position: relative;
+}
+
+ul {
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+}
+svg {
+    /*margin: 2em auto;*/
+    /*border: 1px solid #aaa*/
+}
+#root {
+    transition: transform 0.25s ease-in-out;
+    transition: transform 0.25s ease-in-out;
+}
+.link,
+.node {
+    transition: stroke 0.25s ease-in-out;
+}
+.node {
+    cursor: pointer;
+}
+.link {
+fill: none;
+stroke: #666;
+stroke-width: 1.5px;
+}
+.link--critical {
+    stroke: hsl(0, 100%, 50%);
+}
+.link--critical.dimmed {
+    stroke: hsla(0, 100%, 85%, 0.5);
+    stroke: hsla(0, 100%, var(--lightness), var(--op));
+}
+.link--contributes {
+    stroke: hsl(0, 0%, 50%);
+}
+.link--contributes.dimmed {
+    stroke: hsla(0, 0%, 85%, 0.5);
+    stroke: hsla(0, 0%, var(--lightness), var(--op));
+}
+.link--limited {
+    stroke: hsl(216, 99%, 50%);
+}
+.link--limited.dimmed {
+    stroke: hsla(216, 99%, 85%, 0.5);
+    stroke: hsla(216, 99%, var(--lightness), var(--op));
+}
+
+circle {
+fill: #ccc;
+stroke: #fff;
+stroke-width: 1.5px;
+}
+.level--1 {
+    fill: hsl(39, 100%, 50%);
+}
+.dimmed .level--1 {
+    fill: hsla(39, 100%, 85%, 0.5);
+    fill: hsla(39, 100%, var(--lightness), var(--op));
+}
+.level--2 {
+    fill: hsl(240, 100%, 50%);
+}
+.dimmed .level--2 {
+    fill: hsla(240, 100%, 85%, 0.5);
+    fill: hsla(240, 100%, var(--lightness), var(--op));
+}
+.level--3 {
+    fill: hsl(350, 100%, 50%);
+}
+.dimmed .level--3 {
+    fill: hsla(350, 100%, 85%, 0.5);
+    fill: hsla(350, 100%, var(--lightness), var(--op));
+}
+text {
+    fill: hsl(0, 0%, 0%);
+    font: 12px "nta",Arial,sans-serif;
+    pointer-events: none;
+    opacity: 1;
+    /*transition-delay: 2s;*/
+    transition: opacity 0.25s ease-in-out;
+}
+.level--1 ~ text {
+    fill: black;
+}
+.level--2 ~ text {
+    fill: black;
+}
+.level--3 ~ text {
+    fill: black;
+}
+svg.hide-labels--level1 .level--1 ~ text {
+  opacity: 0;
+}
+svg.hide-labels--level2 .level--2 ~ text {
+  opacity: 0;
+}
+svg.hide-labels--level3 .level--3 ~ text {
+  opacity: 0;
+}
+.dimmed text {
+    opacity: 0;
+}
+.node:hover text,
+.dimmed:hover text {
+  opacity: 1!important;
+}
+.hidden {
+  opacity: 0;
+}
+
+/*.level--1 ~ rect {
+    fill: hsl(39, 100%, 50%);
+}
+.level--2 ~ rect {
+    fill: hsl(240, 100%, 50%);
+}
+.level--3 ~ rect {
+    fill: hsl(350, 100%, 88%);
+}*/
+
+.node--inplay circle {
+animation-duration: 2s;
+animation-iteration-count: infinite;
+}
+.node--inplay .level--1 {
+animation-name: pulsebg1;
+fill: hsla(39, 100%, 50%, 0.8);
+}
+.node--inplay .level--2 {
+animation-name: pulsebg2;
+fill: hsla(240, 100%, 50%, 0.8);
+}
+.node--inplay .level--3 {
+animation-name: pulsebg3;
+fill: hsla(350, 100%, 88%, 0.8);
+}
+@keyframes pulsebg1 {
+0% {
+r: 20;
+fill: hsla(39, 100%, 50%, 0.8);
+}
+5% {
+r: 18;
+fill: hsla(39, 100%, 50%, 0.4);
+}
+20% {
+r: 22;
+fill: hsla(39, 100%, 50%, 0.6);
+}
+30% {
+r: 20;
+fill: hsla(39, 100%, 50%, 0.8);
+}
+31%,100% {
+r: 20;
+fill: hsla(39, 100%, 50%, 0.8);
+}
+}
+@keyframes pulsebg2 {
+0% {
+r: 12;
+fill: hsla(240, 100%, 50%, 0.8);
+}
+5% {
+r: 10;
+fill: hsla(240, 100%, 50%, 0.4);
+}
+20% {
+r: 14;
+fill: hsla(240, 100%, 50%, 0.6);
+}
+30% {
+r: 12;
+fill: hsla(240, 100%, 50%, 0.8);
+}
+31%,100% {
+r: 12;
+fill: hsla(240, 100%, 50%, 0.8);
+}
+}
+@keyframes pulsebg3 {
+0% {
+r: 11;
+fill: hsla(350, 100%, 88%, 0.8);
+}
+5% {
+r: 9;
+fill: hsla(350, 100%, 88%, 0.4);
+}
+20% {
+r: 13;
+fill: hsla(350, 100%, 88%, 0.6);
+}
+30% {
+r: 11;
+fill: hsla(350, 100%, 88%, 0.8);
+}
+31%,100% {
+r: 11;
+fill: hsla(350, 100%, 88%, 0.8);
+}
+}
