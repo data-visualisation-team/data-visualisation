@@ -211,7 +211,6 @@ function updateFilter(r){
 }
 
 function getBoundingBox(t){
-  console.log(t);
   var bb = {};
   bb.yLeast = t.n.y;
   bb.yMost = t.n.y;
@@ -232,8 +231,6 @@ function getBoundingBox(t){
   var scale = 1;
   toX = (w/2-toX*scale)
   toY = (h/2-toY*scale)
-  console.log(t.n.y, toY);
-  console.log(t.n.x, toX);
 
   showLocation(toX, toY, scale)
 }
