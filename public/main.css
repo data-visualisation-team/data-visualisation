@@ -216,11 +216,11 @@ stroke-width: 1.5px;
     fill: hsla(240, 100%, var(--lightness), var(--op));
 }
 .level--3 {
-    fill: hsl(350, 100%, 50%);
+    fill: hsl(63, 80%, 50%);
 }
 .dimmed .level--3 {
-    fill: hsla(350, 100%, 85%, 0.5);
-    fill: hsla(350, 100%, var(--lightness), var(--op));
+    fill: hsla(63, 80%, 85%, 0.5);
+    fill: hsla(63, 80%, var(--lightness), var(--op));
 }
 text {
     fill: hsl(0, 0%, 0%);
@@ -251,10 +251,6 @@ svg.hide-labels--level3 .level--3 ~ text {
 .dimmed text {
     opacity: 0;
 }
-.node:hover text,
-.dimmed:hover text {
-  opacity: 1!important;
-}
 .hidden {
   opacity: 0;
 }
@@ -272,6 +268,15 @@ svg.hide-labels--level3 .level--3 ~ text {
 .node--inplay circle {
 animation-duration: 2s;
 animation-iteration-count: infinite;
+stroke: black;
+}
+.node:hover text,
+.dimmed:hover text,
+.node--inplay text {
+  filter: url(#highlight);
+  fill: #fff;
+  opacity: 1!important;
+  font-size: 16px;
 }
 .node--inplay .level--1 {
 animation-name: pulsebg1;
@@ -283,7 +288,7 @@ fill: hsla(240, 100%, 50%, 0.8);
 }
 .node--inplay .level--3 {
 animation-name: pulsebg3;
-fill: hsla(350, 100%, 88%, 0.8);
+fill: hsla(63, 80%, 85%, 0.8);
 }
 @keyframes pulsebg1 {
 0% {
@@ -332,22 +337,22 @@ fill: hsla(240, 100%, 50%, 0.8);
 @keyframes pulsebg3 {
 0% {
 r: 11;
-fill: hsla(350, 100%, 88%, 0.8);
+fill: hsla(63, 80%, 50%, 1);
 }
 5% {
 r: 9;
-fill: hsla(350, 100%, 88%, 0.4);
+fill: hsla(63, 80%, 50%, 0.8);
 }
 20% {
 r: 13;
-fill: hsla(350, 100%, 88%, 0.6);
+fill: hsla(63, 80%, 50%, 0.9);
 }
 30% {
 r: 11;
-fill: hsla(350, 100%, 88%, 0.8);
+fill: hsla(63, 80%, 50%, 1);
 }
 31%,100% {
 r: 11;
-fill: hsla(350, 100%, 88%, 0.8);
+fill: hsla(63, 80%, 50%, 1);
 }
 }

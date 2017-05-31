@@ -24,7 +24,7 @@
   var textLvl2X = nodeLvl2R + 2;
 
   var nodeLvl3R = 11;
-  var textLvl3X = nodeLvl3R - 2;
+  var textLvl3X = nodeLvl3R + 2;
 
   var force, svg, rootg, path, node, nodeLvl1, nodeLvl2, nodeLvl3;
 
@@ -125,11 +125,10 @@ function mapLevelNumberToName(lvlID){
 
 
 // ===================================
-
+// get a level number based on the name
+// we use level numbers in css classes
 // ===================================
 function mapLevelNameToNumeric(lvlName){
-  // get a level number based on the name
-  // we use level numbers in css classes
   var namedLevel = levels.filter(function(level){
     return level.label == lvlName
   })
@@ -181,7 +180,10 @@ function updateFilter(r){
     $('#filter').removeClass("open");
     disableVisibility(false);
 
+
     if(r == undefined) return
+
+    getBoundingBox(r);
 
     var t = '<h1>' + r.n.label + '</h1>'
     t = t + '<button id="zoomToNode" data-node-x="' + r.n.x + '" data-node-y="' + r.n.y + '">show</button>'
@@ -206,6 +208,34 @@ function updateFilter(r){
     $('#filter').addClass("open");
     disableVisibility(true);
     $('#zoomToNode').focus();
+}
+
+function getBoundingBox(t){
+  console.log(t);
+  var bb = {};
+  bb.yLeast = t.n.y;
+  bb.yMost = t.n.y;
+  bb.xLeast = t.n.x;
+  bb.xMost = t.n.x;
+
+  t.parents.forEach(function(p){
+    if(p.y > bb.yMost){ bb.yMost = p.y; }
+    if(p.y < bb.yLeast){ bb.yLeast = p.y; }
+    if(p.x > bb.xMost){ bb.xMost = p.x; }
+    if(p.x < bb.xLeast){ bb.xLeast = p.x; }
+  })
+  //console.log(bb);
+  //return bb;
+
+  var toY = bb.yLeast + ((bb.yMost - bb.yLeast) / 2);
+  var toX = bb.xLeast + ((bb.xMost - bb.xLeast) / 2);
+  var scale = 1;
+  toX = (w/2-toX*scale)
+  toY = (h/2-toY*scale)
+  console.log(t.n.y, toY);
+  console.log(t.n.x, toX);
+
+  showLocation(toX, toY, scale)
 }
 
 
@@ -248,7 +278,6 @@ function showBranch(relLink, boolDirDown){
     })
   }
 }
-
 
 
 // ===================================
@@ -361,7 +390,7 @@ function clickNode(d){
 
 
 // ===================================
-// move the view to focus on a particular node
+// get location of a specific node
 // ===================================
 function zoomToNode(n){
   var dcx, dcy, scale;
@@ -374,8 +403,17 @@ function zoomToNode(n){
     dcx = (w/2-n.x*scale)
     dcy = (h/2-n.y*scale)
   }
-  zoom.translate([dcx,dcy]);
-  rootg.attr("transform", "translate("+ dcx + "," + dcy  + ") scale(" + scale + ")");
+  showLocation(dcx, dcy, scale)
+}
+
+
+
+// ===================================
+// move the view to focus on a particular location
+// ===================================
+function showLocation(x, y, scale){
+  zoom.translate([x,y]);
+  rootg.attr("transform", "translate("+ x + "," + y  + ") scale(" + scale + ")");
 }
 
 
@@ -393,6 +431,7 @@ function hideNodes(){
 // ===================================
 function showNode(nodeID){
     if(nodeID > ""){
+        // treeNodes.push(nodes.filter(function(n){ return n.id == nodeID })[0]);
         $('#' + nodeID).each(function(){
             $(this).removeClass('dimmed');
             $(this).find('text').removeClass('dimmed');
@@ -472,6 +511,20 @@ function startGraph(){
       .attr("height", h)
       .attr("class", "hide-labels--level1 hide-labels--level2 hide-labels--level3");
   rootg = svg.append("g").attr('id', 'root').attr("transform", "translate(" + w/4 + "," + h/4 + ") scale(" + baseScale + ")");
+
+
+  svg.append('svg:defs').selectAll("filter").data(["end"]).enter().append("svg:filter")
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 1)
+      .attr('height', 1)
+      .attr('id', 'highlight')
+      .append('svg:feFlood')
+      .attr('flood-color', 'hsl(0, 0%, 0%)')
+      svg.selectAll('filter')
+      .append('svg:feComposite')
+      .attr('in','SourceGraphic');
+
 
   // ===================================
   // add the links
