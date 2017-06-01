@@ -414,6 +414,60 @@ function showLocation(x, y, scale){
 }
 
 
+
+$('#zoomIn').on('click', function(){zoomIn()});
+function zoomIn(){
+  var curr = d3.transform(rootg.attr("transform"))
+  rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] + 0.1) + ")");
+}
+$('#zoomOut').on('click', function(){zoomOut()});
+function zoomOut(){
+  var curr = d3.transform(rootg.attr("transform"))
+  rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] - 0.1) + ")");
+}
+
+$('#moveUp').on('mousedown', function(){
+  moveUpInt = setInterval(function() { moveUp(); }, 50);
+}).mouseup(function() {
+    clearInterval(moveUpInt);
+});
+function moveUp(){
+  var curr = d3.transform(rootg.attr("transform"))
+  rootg.attr("transform", "translate("+ curr.translate[0] + "," + (curr.translate[1] + 50)  + ") scale(" + curr.scale[0] + ")");
+}
+
+$('#moveDown').on('mousedown', function(){
+  moveDownInt = setInterval(function() { moveDown(); }, 50);
+}).mouseup(function() {
+    clearInterval(moveDownInt);
+});
+function moveDown(){
+  var curr = d3.transform(rootg.attr("transform"))
+  rootg.attr("transform", "translate("+ curr.translate[0] + "," + (curr.translate[1] - 50)  + ") scale(" + curr.scale[0] + ")");
+}
+
+$('#moveLeft').on('mousedown', function(){
+  moveLeftInt = setInterval(function() { moveLeft(); }, 50);
+}).mouseup(function() {
+    clearInterval(moveLeftInt);
+});
+function moveLeft(){
+  var curr = d3.transform(rootg.attr("transform"))
+  rootg.attr("transform", "translate("+ (curr.translate[0] + 50) + "," + curr.translate[1]  + ") scale(" + curr.scale[0] + ")");
+}
+
+$('#moveRight').on('mousedown', function(){
+  moveRightInt = setInterval(function() { moveRight(); }, 50);
+}).mouseup(function() {
+    clearInterval(moveRightInt);
+});
+function moveRight(){
+  var curr = d3.transform(rootg.attr("transform"))
+  rootg.attr("transform", "translate("+ (curr.translate[0] - 50) + "," + curr.translate[1]  + ") scale(" + curr.scale[0] + ")");
+}
+
+
+
 // ===================================
 // fade out elements
 // ===================================
@@ -580,11 +634,11 @@ function startGraph(){
   // ===================================
   // handle mousewheel/doubleclick zoom
   // ===================================
-  zoom.on("zoom", function() {
-      // console.log(d3.event.scale)
-      rootg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-  });
-  svg.call(zoom);
+  // zoom.on("zoom", function() {
+  //     // console.log(d3.event.scale)
+  //     rootg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  // });
+  // svg.call(zoom);
 
 
   // ===================================
