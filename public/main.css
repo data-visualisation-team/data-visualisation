@@ -19,15 +19,49 @@ button {
   background: #000;
   color: #fff;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin: 0.5rem;
+  min-width: 3.6em;
+  padding: 0.5em 0.5em;
 }
+
+.branding {
+  border-left: 3px solid #009390;
+  background: #fff url(/hmrc_crest.png) 10px center no-repeat;
+  padding-left: 53px;
+  background-size: contain;
+  font-family: Helvetica, Arial;
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: left;
+  position: relative;
+}
+.branding:before {
+    content: "";
+    position: absolute;
+    left: -0.7rem;
+    right: -0.5rem;
+    top: -1rem;
+    border-top: 2px solid rgba(130, 128, 128, 0.8);
+}
+.branding__built {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+.branding__hmrc {
+  display: block;
+  font-size: 1.1;
+}
+
+
 #close {
   background: none;
   border: none;
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 0.25rem;
+  right: 0rem;
+  margin: 0;
 }
 #controls {
   position: absolute;
@@ -39,11 +73,6 @@ button {
   width: 300px;
   border-right-width: 0;
   border-top-width: 0;
-}
-#controls__search {
-  font-size: 2rem;
-  text-transform: uppercase;
-  color: #828080;
 }
 #moveGrid {
   display: grid;
@@ -67,10 +96,12 @@ button {
   grid-row: 2;
 }
 #search {
-    font-size: 2rem;
+    font-size: 1.4rem;
     border: 2px solid grey;
     background: rgba(255,255,255,0.8);
-    width: 7em;
+    display: block;
+    margin: 0 auto;
+    width: 100%;
 }
 #filter {
     text-align: left;
@@ -91,6 +122,13 @@ button {
 }
 #filter h1 {
   line-height: 1.1;
+  font-weight: 400;
+  font-size: 1.8rem;
+  margin-top: 1em;
+}
+#filter h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
 }
 .filter__entry {
     margin-bottom: 0.5em;

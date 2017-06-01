@@ -186,8 +186,9 @@ function updateFilter(r){
     getBoundingBox(r);
 
     var t = '<h1>' + r.n.label + '</h1>'
-    t = t + '<button id="zoomToNode" data-node-x="' + r.n.x + '" data-node-y="' + r.n.y + '">show</button>'
     t = t + '<p>' + r.n.summary + '</p>'
+    t = t + '<button id="zoomToNode" data-node-x="' + r.n.x + '" data-node-y="' + r.n.y + '">show</button>'
+
     if(r.parents.length > 0){
         t = t + '<h2>Contributes to</h2>'
         t = t + '<ul>'
