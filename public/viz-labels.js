@@ -26,12 +26,21 @@
   var nodeLvl3R = 11;
   var textLvl3X = nodeLvl3R + 2;
 
-  var force, svg, rootg, path, node, nodeLvl1, nodeLvl2, nodeLvl3;
+  var force, svg, rootg, path, node, nodeLvl1, nodeLvl2, nodeLvl3, nodeErrors, linkTypeErrors;
 
+  // check css variable support
+  // used for visibility slider
   var supportsVariables = false;
   if(window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0)){
     supportsVariables = true;
   }
+
+  // fire off the calls to get the data
+  getAPIdata();
+
+// ======================================================================
+// ======================================================================
+// ======================================================================
 
 
 // ===================================
@@ -77,11 +86,7 @@ function getAPIdata(){
            rel: x.rel
          };
        });
-
-       // set up some arrays to allow us to easily pick the nodes from each level
-       assignNodeLevels()
-       // kick it all off
-       startGraph()
+       init();
      } else {
        // wait a bit longer for the data to arrive
        setTimeout(waitForData, 100)
@@ -90,13 +95,38 @@ function getAPIdata(){
 
  }
 
-// fire off the calls to get the data
-getAPIdata();
 
 
+function init(){
+  $('#search').focus();
+  // set up some arrays to allow us to easily pick the nodes from each level
+  assignNodeLevels()
+  // kick it all off
+  startGraph()
+  // show error status
+  checkForErrors()
+  //active controls
+  assignMoveAndZoomControls()
+  //events
+  assignEvents()
+}
 
 // ===================================
-// assign nodes to levels for easy selection later
+// display error notification
+// ===================================
+function checkForErrors(){
+  if(nodeErrors.length > 0 || linkTypeErrors.length > 0){
+    $('#controls').append('<button class="button--error" id="error">There are errors in the data</button>')
+    $('#error').focus();
+    $('#error').on('click', function(e){
+      e.preventDefault();
+      showErrors();
+    })
+  }
+}
+
+// ===================================
+// assign nodes to levels and allocate errors for easy selection later
 // ===================================
 function assignNodeLevels(){
   nodeLvl1 = nodes.filter(function(node){
@@ -107,6 +137,16 @@ function assignNodeLevels(){
   })
   nodeLvl3 = nodes.filter(function(node){
       return node.level == mapLevelNumberToName(3)
+  })
+  nodeErrors = nodes.filter(function(node){
+    return mapLevelNameToNumeric(node.level) == null
+  })
+  linkTypeErrors = links.filter(function(link){
+    var test = false
+    if(link.rel.toLowerCase() != "critical" && link.rel.toLowerCase() != "contributes" && link.rel.toLowerCase() != "none"){
+      test = true
+    }
+    return test;
   })
 }
 
@@ -120,7 +160,11 @@ function mapLevelNumberToName(lvlID){
   var namedLevel = levels.filter(function(level){
     return level.level == lvlID
   })
-  return namedLevel[0].label
+  if(namedLevel.length > 0){
+    return namedLevel[0].label
+  } else {
+    return null
+  }
 }
 
 
@@ -132,7 +176,11 @@ function mapLevelNameToNumeric(lvlName){
   var namedLevel = levels.filter(function(level){
     return level.label == lvlName
   })
-  return namedLevel[0].level
+  if(namedLevel.length > 0){
+    return namedLevel[0].level
+  } else {
+    return null
+  }
 }
 
 
@@ -180,12 +228,20 @@ function updateFilter(r){
     $('#filter').removeClass("open");
     disableVisibility(false);
 
-
     if(r == undefined) return
 
     getBoundingBox(r);
 
-    var t = '<h1>' + r.n.label + '</h1>'
+    var t = "";
+    if($('#' + r.n.id + ' .level--error').length > 0){
+      t = t + '<a href="" id="backToErrorList">back to error list</a>';
+    }
+    $('body').on('click', '#backToErrorList', function(e){
+      e.preventDefault();
+      showErrors();
+    })
+
+    t = t + '<h1>' + r.n.label + '</h1>'
     t = t + '<p>' + r.n.summary + '</p>'
     t = t + '<button id="zoomToNode" data-node-x="' + r.n.x + '" data-node-y="' + r.n.y + '">show</button>'
 
@@ -193,7 +249,7 @@ function updateFilter(r){
         t = t + '<h2>Contributes to</h2>'
         t = t + '<ul>'
         r.parents.forEach(function(p){
-            t = t + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + p.source.index + '"><span class="filter__action">' + p.source.label + '</span> <span class="filter__status filter__status--' + p.rel.toLowerCase() + '">' + p.rel + '</span></a></li>';
+            t = t + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + p.source.index + '"><h3 class="filter__action">' + p.source.label + '</h3> <span class="filter__status filter__status--' + p.rel.toLowerCase() + '">' + p.rel + '</span></a></li>';
         })
         t = t + '</ul>'
     }
@@ -201,7 +257,7 @@ function updateFilter(r){
         t = t + '<h2>Supported by</h2>'
         t = t + '<ul>'
         r.children.forEach(function(c){
-            t = t + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + c.target.index + '"><span class="filter__action">' + c.target.label + '</span> <span class="filter__status filter__status--' + c.rel.toLowerCase() + '">' + c.rel + '</span></a></li>';
+            t = t + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + c.target.index + '"><h3 class="filter__action">' + c.target.label + '</h3> <span class="filter__status filter__status--' + c.rel.toLowerCase() + '">' + c.rel + '</span></a></li>';
         })
         t = t + '</ul>'
     }
@@ -211,6 +267,13 @@ function updateFilter(r){
     $('#zoomToNode').focus();
 }
 
+
+// ===================================
+// get bounding box of selected nodes
+// currently only uses nodes displayed in filter
+// could be improved to include all nodes shown in graph view (up and down tree)
+// and then work out scaling needed to show them all
+// ===================================
 function getBoundingBox(t){
   var bb = {};
   bb.yLeast = t.n.y;
@@ -243,6 +306,7 @@ function getBoundingBox(t){
 function getLinks(rel){
   return links.filter(function(link){return link.rel.toLowerCase() == rel.toLowerCase()})
 }
+
 
 
 // ===================================
@@ -415,56 +479,67 @@ function showLocation(x, y, scale){
 }
 
 
+// ===================================
+// move and zoom controls
+// ===================================
+function assignMoveAndZoomControls(){
+    $('#zoomIn').on('click', function(){zoomIn()});
+    function zoomIn(){
+      var curr = d3.transform(rootg.attr("transform"))
+      // var dx = (curr.translate[0] * curr.scale[0] + 0.1)
+      // var dy = (curr.translate[1] * curr.scale[0] + 0.1)
+      rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] + 0.1) + ")");
+      // rootg.attr("transform", "translate("+ dx + "," + dy  + ") scale(" + (curr.scale[0] + 0.1) + ")");
+    }
+    $('#zoomOut').on('click', function(){zoomOut()});
+    function zoomOut(){
+      var curr = d3.transform(rootg.attr("transform"))
+      rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] - 0.1) + ")");
+    }
 
-$('#zoomIn').on('click', function(){zoomIn()});
-function zoomIn(){
-  var curr = d3.transform(rootg.attr("transform"))
-  rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] + 0.1) + ")");
-}
-$('#zoomOut').on('click', function(){zoomOut()});
-function zoomOut(){
-  var curr = d3.transform(rootg.attr("transform"))
-  rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] - 0.1) + ")");
-}
+    $('#moveUp').on('click', function(){moveUp();});
+    $('#moveUp').on('mousedown', function(){
+      moveUpInt = setInterval(function() { moveUp(); }, 250);
+    }).mouseup(function() {
+        clearInterval(moveUpInt);
+    });
+    function moveUp(){
+      var curr = d3.transform(rootg.attr("transform"))
+      rootg.attr("transform", "translate("+ curr.translate[0] + "," + (curr.translate[1] + 50)  + ") scale(" + curr.scale[0] + ")");
+    }
 
-$('#moveUp').on('mousedown', function(){
-  moveUpInt = setInterval(function() { moveUp(); }, 50);
-}).mouseup(function() {
-    clearInterval(moveUpInt);
-});
-function moveUp(){
-  var curr = d3.transform(rootg.attr("transform"))
-  rootg.attr("transform", "translate("+ curr.translate[0] + "," + (curr.translate[1] + 50)  + ") scale(" + curr.scale[0] + ")");
-}
+    $('#moveDown').on('click', function(){moveDown();});
+    $('#moveDown').on('mousedown', function(){
+      moveDownInt = setInterval(function() { moveDown(); }, 250);
+    }).mouseup(function() {
+        clearInterval(moveDownInt);
+    });
+    function moveDown(){
+      var curr = d3.transform(rootg.attr("transform"))
+      rootg.attr("transform", "translate("+ curr.translate[0] + "," + (curr.translate[1] - 50)  + ") scale(" + curr.scale[0] + ")");
+    }
 
-$('#moveDown').on('mousedown', function(){
-  moveDownInt = setInterval(function() { moveDown(); }, 50);
-}).mouseup(function() {
-    clearInterval(moveDownInt);
-});
-function moveDown(){
-  var curr = d3.transform(rootg.attr("transform"))
-  rootg.attr("transform", "translate("+ curr.translate[0] + "," + (curr.translate[1] - 50)  + ") scale(" + curr.scale[0] + ")");
-}
+    $('#moveLeft').on('click', function(){moveLeft();});
+    $('#moveLeft').on('mousedown', function(){
+      moveLeftInt = setInterval(function() { moveLeft(); }, 250);
+    }).mouseup(function() {
+        clearInterval(moveLeftInt);
+    });
+    function moveLeft(){
+      var curr = d3.transform(rootg.attr("transform"))
+      rootg.attr("transform", "translate("+ (curr.translate[0] + 50) + "," + curr.translate[1]  + ") scale(" + curr.scale[0] + ")");
+    }
 
-$('#moveLeft').on('mousedown', function(){
-  moveLeftInt = setInterval(function() { moveLeft(); }, 50);
-}).mouseup(function() {
-    clearInterval(moveLeftInt);
-});
-function moveLeft(){
-  var curr = d3.transform(rootg.attr("transform"))
-  rootg.attr("transform", "translate("+ (curr.translate[0] + 50) + "," + curr.translate[1]  + ") scale(" + curr.scale[0] + ")");
-}
-
-$('#moveRight').on('mousedown', function(){
-  moveRightInt = setInterval(function() { moveRight(); }, 50);
-}).mouseup(function() {
-    clearInterval(moveRightInt);
-});
-function moveRight(){
-  var curr = d3.transform(rootg.attr("transform"))
-  rootg.attr("transform", "translate("+ (curr.translate[0] - 50) + "," + curr.translate[1]  + ") scale(" + curr.scale[0] + ")");
+    $('#moveRight').on('click', function(){moveRight();});
+    $('#moveRight').on('mousedown', function(){
+      moveRightInt = setInterval(function() { moveRight(); }, 250);
+    }).mouseup(function() {
+        clearInterval(moveRightInt);
+    });
+    function moveRight(){
+      var curr = d3.transform(rootg.attr("transform"))
+      rootg.attr("transform", "translate("+ (curr.translate[0] - 50) + "," + curr.translate[1]  + ") scale(" + curr.scale[0] + ")");
+    }
 }
 
 
@@ -576,7 +651,17 @@ function startGraph(){
       svg.selectAll('filter')
       .append('svg:feComposite')
       .attr('in','SourceGraphic');
-
+  svg.append('svg:defs').selectAll("filter").data(["end"]).enter().append("svg:filter")
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 1)
+      .attr('height', 1)
+      .attr('id', 'error')
+      .append('svg:feFlood')
+      .attr('flood-color', 'red')
+      svg.selectAll('filter')
+      .append('svg:feComposite')
+      .attr('in','SourceGraphic');
 
   // ===================================
   // add the links
@@ -601,10 +686,20 @@ function startGraph(){
       .call(force.drag);
       node.append("circle")
           .attr("r", function(d) {
-            return (20 / (mapLevelNameToNumeric(d.level)))
+            var radius = 10;
+            var radiusLevel = mapLevelNameToNumeric(d.level)
+            if(radiusLevel){
+                radius = (20 / radiusLevel)
+            }
+            return radius;
           })
           .attr("class", function(d) {
-            return "level--" + mapLevelNameToNumeric(d.level)
+            var nodeClass = "level--error"
+            var nodeClassLevel = mapLevelNameToNumeric(d.level)
+            if(nodeClassLevel){
+              nodeClass = "level--" + mapLevelNameToNumeric(d.level)
+            }
+            return nodeClass
           });
       node.append("text")
       .attr('id', function(d) { return "text--" + (d.index);})
@@ -704,10 +799,7 @@ function start() {
     if (force.alpha() > 0) {
       requestAnimationFrame(render);
     } else {
-      document.querySelectorAll('.text').forEach(function(t){
-        t.classList.remove('hidden')
-      })
-
+      renderDone()
     }
 
   })
@@ -720,131 +812,175 @@ var updateNode = function() {
     });
 }
 
+// ===================================
+// done calculating chart
+// ===================================
+function renderDone(){
+  // show text if set to visible
+  // document.querySelectorAll('.text').forEach(function(t){
+  //   t.classList.remove('hidden')
+  // })
+}
 
 
+// ===================================
+// display errors when chart loads
+// ===================================
+function showErrors(){
+  var showErrorList = false;
+  var d = "";
 
+  if(nodeErrors.length > 0){
+      showErrorList = true;
+      d = d + '<h2>The following nodes have incorrect level assigned:</h2>'
+      d = d + '<ul class="filterlist filterlist--withheaders">'
+      nodeErrors.forEach(function(nodeError){
+        d = d + '<li class="filter__entry"><a class="filter__link" href="" data-node="' + nodeError.index + '"><span class="filter__action">' + nodeError.label + '</span> <span class="filter__id">' + nodeError.id + '</span> <span class="filter__level">' + nodeError.level + '</span></a></li>';
+      })
+      d = d + '</ul>'
+  }
+
+  if(linkTypeErrors.length > 0){
+    showErrorList = true;
+    d = d + '<h2>The following links have incorrect relationship assigned:</h2>'
+    d = d + '<ul class="filterlist filterlist--withheaders">'
+    linkTypeErrors.forEach(function(linkError){
+      d = d + '<li class="filter__entry"><span class="filter__rel">' + linkError.rel + '</span> <a class="filter__link filter__link--small filter__link--source" href="" data-node="' + linkError.source.index + '">' + linkError.source.id + '</a> <a class="filter__link filter__link--small filter__link--target" href="" data-node="' + linkError.target.index + '">' + linkError.target.id + '</a></li>'
+    })
+    d = d + '</ul>'
+  }
+
+  if(showErrorList){
+    $('#filter__inner').html("");
+    $('#filter').removeClass("open");
+    d = '<h1>There are some anomalies</h1>' + d
+    $('#filter__inner').append(d);
+    $('#filter').addClass("open");
+  }
+}
 
 // ===================================
 // ===================================
 // EVENTS
 // ===================================
 // ===================================
-
-// ===================================
-// handle refining
-// ===================================
-$('[name="refine"]').on('change', function(){
-  updateFilter();
-  showLinks($('[name="refine"]:checked')[0].value)
-});
-
-
-// ===================================
-// handle label toggle
-// ===================================
-$('[name="labels"]').on('change', function(){
-  if($(this).is(':checked')){
-    $('svg').removeClass('hide-labels--level' + $(this).val());
-  } else {
-    $('svg').addClass('hide-labels--level' + $(this).val());
-  }
-})
+function assignEvents(){
+  // ===================================
+  // handle refining
+  // ===================================
+  $('[name="refine"]').on('change', function(){
+    updateFilter();
+    showLinks($('[name="refine"]:checked')[0].value)
+  });
 
 
-// ===================================
-// handle search field
-// ===================================
-$('#controls__search').on('submit', function(e){
-  e.preventDefault();
-  var s = $('#search').val().toLowerCase();
-  searchNodes(s, true)
-})
-
-
-
-// ===================================
-// highlight node and update UI when using links in sidebar
-// ===================================
-$('body').on('click', '.filter__link', function(e){
-    e.preventDefault();
-    var n = $(this).attr('data-node');
-    var fn = nodes.filter(function(node){
-        return n == node.index
-    })
-    clickNode(fn[0])
-})
-
-
-// ===================================
-// centre view on node
-// this sits on a cta in the sidebar
-// ===================================
-$('body').on('click', '#zoomToNode', function(e){
-  e.preventDefault();
-  var n = [];
-  n.x = $(this).attr('data-node-x')
-  n.y = $(this).attr('data-node-y')
-  zoomToNode(n)
-})
-
-
-// ===================================
-// reset the zoom
-// cta in the controls section
-// ===================================
-$('#resetZoom').on('click', function(e){
-  e.preventDefault();
-  zoomToNode();
-})
-
-
-// ===================================
-// close the sidebar and display all the nodes and links again
-// ===================================
-$('#close').on('click', function(e){
-  e.preventDefault();
-  hideInPlay();
-  reset();
-  showNode();
-})
-
-
-// ===================================
-// key codes
-// ===================================
-$('body').on('keyup', function(e){
-  switch (e.keyCode){
-    case 27:
-    // close sidebar on ESC key
-    if($('#filter').is('.open')){
-        e.preventDefault();
-        $('#close').trigger('click')
+  // ===================================
+  // handle label toggle
+  // ===================================
+  $('[name="labels"]').on('change', function(){
+    if($(this).is(':checked')){
+      $('svg').removeClass('hide-labels--level' + $(this).val());
+    } else {
+      $('svg').addClass('hide-labels--level' + $(this).val());
     }
-    break;
-  }
-})
+  })
 
 
-// ===================================
-// handle prev next controls for navigating between top level nodes
-// ===================================
-$('#prev').on('click', function(e){
-  e.preventDefault();
-  currentLevel1 --
-  if(currentLevel1 < 0){
-    currentLevel1 = nodeLvl1.length -1
-  }
-  zoomToNode(nodeLvl1[currentLevel1]);
-})
-$('#next').on('click', function(e){
-  e.preventDefault();
-  currentLevel1 ++
-  if(currentLevel1 > nodeLvl1.length -1){
-    currentLevel1 = 0
-  }
-  zoomToNode(nodeLvl1[currentLevel1]);
-})
+  // ===================================
+  // handle search field
+  // ===================================
+  $('#controls__search').on('submit', function(e){
+    e.preventDefault();
+    var s = $('#search').val().toLowerCase();
+    searchNodes(s, true)
+  })
 
+
+
+  // ===================================
+  // highlight node and update UI when using links in sidebar
+  // ===================================
+  $('body').on('click', '.filter__link', function(e){
+      e.preventDefault();
+      var n = $(this).attr('data-node');
+      var fn = nodes.filter(function(node){
+          return n == node.index
+      })
+      clickNode(fn[0])
+  })
+
+
+  // ===================================
+  // centre view on node
+  // this sits on a cta in the sidebar
+  // ===================================
+  $('body').on('click', '#zoomToNode', function(e){
+    e.preventDefault();
+    var n = [];
+    n.x = $(this).attr('data-node-x')
+    n.y = $(this).attr('data-node-y')
+    zoomToNode(n)
+  })
+
+
+  // ===================================
+  // reset the zoom
+  // cta in the controls section
+  // ===================================
+  $('#resetZoom').on('click', function(e){
+    e.preventDefault();
+    zoomToNode();
+  })
+
+
+  // ===================================
+  // close the sidebar and display all the nodes and links again
+  // ===================================
+  $('#close').on('click', function(e){
+    e.preventDefault();
+    hideInPlay();
+    reset();
+    showNode();
+    $('#search').focus();
+  })
+
+
+  // ===================================
+  // key codes
+  // ===================================
+  $('body').on('keyup', function(e){
+    switch (e.keyCode){
+      case 27:
+      // close sidebar on ESC key
+      if($('#filter').is('.open')){
+          e.preventDefault();
+          $('#close').trigger('click')
+      }
+      break;
+    }
+  })
+
+
+  // ===================================
+  // handle prev next controls for navigating between top level nodes
+  // ===================================
+  $('#prev').on('click', function(e){
+    e.preventDefault();
+    currentLevel1 --
+    if(currentLevel1 < 0){
+      currentLevel1 = nodeLvl1.length -1
+    }
+    zoomToNode(nodeLvl1[currentLevel1]);
+  })
+  $('#next').on('click', function(e){
+    e.preventDefault();
+    currentLevel1 ++
+    if(currentLevel1 > nodeLvl1.length -1){
+      currentLevel1 = 0
+    }
+    zoomToNode(nodeLvl1[currentLevel1]);
+  })
+}
 
 
 // ===================================

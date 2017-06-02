@@ -49,7 +49,8 @@ app.get('/nodes', (req, res) => {
     var data = []
     var tmp = response.values
     tmp.forEach(function(v){
-      if(v[1] > ""){
+      // ensure we have the data we'll need for each node
+      if(v[0] && v[1] && v[2]){
         data.push({"id": parseInt(v[0]), "label": v[1], "level": v[2], "summary": v[3] || ""})
       }
     })
@@ -68,7 +69,10 @@ app.get('/links', (req, res) => {
     var data = []
     var tmp = response.values
     tmp.forEach(function(v){
-      data.push({"target": parseInt(v[0]), "rel": v[1], "source": parseInt(v[2])})
+      // ensure we have the data we'll need for each link
+      if(v[0] && v[1] && v[2]){
+        data.push({"target": parseInt(v[0]), "rel": v[1], "source": parseInt(v[2])})
+      }
     })
     // pop off the header row
     data.shift()
