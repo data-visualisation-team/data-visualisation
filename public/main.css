@@ -384,7 +384,7 @@ stroke-width: 1.5px;
 }
 .link--contributes {
     stroke: hsl(152, 39%, 50%);
-    stroke-dasharray: 2;
+    /*stroke-dasharray: 2;*/
 }
 .link--contributes.dimmed {
     stroke: hsla(152, 39%, 85%, 0.5);
