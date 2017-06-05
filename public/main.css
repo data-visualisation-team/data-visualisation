@@ -303,11 +303,15 @@ button:focus {
 }
 
 .filter__status--critical {
-    background: maroon;
+    background: hsl(300, 51%, 50%);
     color: #fff;
 }
 .filter__status--contributes {
-    background: blue;
+    background: hsl(152, 39%, 50%);
+    color: #fff;
+}
+.filter__status--limited {
+    background: hsl(336, 26%, 50%);
     color: #fff;
 }
 fieldset {
@@ -372,25 +376,27 @@ stroke: #03f5f2;
 stroke-width: 1.5px;
 }
 .link--critical {
-    stroke: hsl(0, 100%, 50%);
+    stroke: hsl(300, 51%, 50%);
 }
 .link--critical.dimmed {
-    stroke: hsla(0, 100%, 85%, 0.5);
-    stroke: hsla(0, 100%, var(--lightness), var(--op));
+    stroke: hsla(300, 51%, 85%, 0.5);
+    stroke: hsla(300, 51%, var(--lightness), var(--op));
 }
 .link--contributes {
-    stroke: hsl(0, 0%, 50%);
+    stroke: hsl(152, 39%, 50%);
+    stroke-dasharray: 2;
 }
 .link--contributes.dimmed {
-    stroke: hsla(0, 0%, 85%, 0.5);
-    stroke: hsla(0, 0%, var(--lightness), var(--op));
+    stroke: hsla(152, 39%, 85%, 0.5);
+    stroke: hsla(152, 39%, var(--lightness), var(--op));
 }
 .link--limited {
-    stroke: hsl(216, 99%, 50%);
+    stroke: hsl(336, 26%, 50%);
+    stroke-dasharray: 5;
 }
 .link--limited.dimmed {
-    stroke: hsla(216, 99%, 85%, 0.5);
-    stroke: hsla(216, 99%, var(--lightness), var(--op));
+    stroke: hsla(336, 26%, 85%, 0.5);
+    stroke: hsla(336, 26%, var(--lightness), var(--op));
 }
 
 circle {
