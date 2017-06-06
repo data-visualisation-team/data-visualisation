@@ -690,7 +690,7 @@ function startGraph(){
       .attr("class", "node")
       .attr("id", function(d){ return d.id })
       .attr("data-label", function(d){ return d.label; })
-      .call(force.drag);
+      //.call(force.drag);
       node.append("circle")
           .attr("r", function(d) {
             var radius = 10;
