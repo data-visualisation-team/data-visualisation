@@ -202,21 +202,25 @@ function showData(n){
 
 // ===================================
 // get upstream nodes from given node
+// compare id, not whole object so we can match in popstate when nodes may have moved
 // ===================================
 function getSource(n){
-  return links.filter(function(link){
-      return link.source == n
+  var s = links.filter(function(link){
+      return link.source.id == n.id
   })
+  return s;
 }
 
 
 // ===================================
 // get downstream nodes from given node
+// compare id, not whole object so we can match in popstate when nodes may have moved
 // ===================================
 function getTarget(n){
-  return links.filter(function(link){
-      return link.target == n
+  var t = links.filter(function(link){
+      return link.target.id == n.id
   })
+  return t;
 }
 
 
@@ -430,7 +434,7 @@ function searchNodes(str, boolSingle){
 // ===================================
 // click a node to display data
 // ===================================
-function clickNode(d){
+function clickNode(d, boolUpdateHistory){
     reset()
     var el = $('#' + d.id);
     if(el.hasClass('node--inplay')){
@@ -443,6 +447,9 @@ function clickNode(d){
         hideNodes()
         $('.node--inplay').removeClass('node--inplay')
         el.addClass('node--inplay');
+        if(boolUpdateHistory){
+          history.pushState({ node: d }, "d.label", "/?" + d.id);
+        }
         showNodeGroup(d.id)
         // update the sidebar
         showData(d)
@@ -757,7 +764,7 @@ function startGraph(){
   // ===================================
   node.on('click', function(d){
       d3.event.stopPropagation();
-      clickNode(d)
+      clickNode(d, true)
   })
   node.on("dblclick.zoom", function(d) { d3.event.stopPropagation();
   //     zoomToNode(d)
@@ -775,6 +782,9 @@ function startGraph(){
 // ===================================
 function start() {
   var ticksPerRender = 1;
+  if(window.location.search.length > 0){
+    ticksPerRender = 20
+  }
   requestAnimationFrame(function render() {
     for (var i = 0; i < ticksPerRender; i++) {
       force.tick();
@@ -820,6 +830,16 @@ function renderDone(){
   // document.querySelectorAll('.text').forEach(function(t){
   //   t.classList.remove('hidden')
   // })
+
+  if(window.location.search.length > 0){
+    var nodeID = window.location.search.split('?')[1];
+    var thisNode = nodes.filter(function(n){
+      return n.id == nodeID
+    })
+    if(thisNode.length == 1){
+      clickNode(thisNode[0])
+    }
+  }
 }
 
 
@@ -866,6 +886,16 @@ function showErrors(){
 // ===================================
 function assignEvents(){
   // ===================================
+  // handle popstate
+  // ===================================
+  window.onpopstate = function(event) {
+    if(event.state){
+      clickNode(event.state.node, false)
+    }
+  };
+
+
+  // ===================================
   // handle refining
   // ===================================
   $('[name="refine"]').on('change', function(){
@@ -906,7 +936,7 @@ function assignEvents(){
       var fn = nodes.filter(function(node){
           return n == node.index
       })
-      clickNode(fn[0])
+      clickNode(fn[0], true)
   })
 
 
