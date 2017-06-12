@@ -5,12 +5,12 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
 const google = require('googleapis')
-const credentials = require('./' + process.env.CREDENTIALS + '.json')
+//const credentials = require('./' + process.env.CREDENTIALS + '.json')
 
 const auth = new google.auth.JWT(
-  credentials.client_email,
+  process.env.CREDSCLIENTEMAIL,
   null,
-  credentials.private_key,
+  process.env.CREDSPRIVATEKEY,
   [
     'https://www.googleapis.com/auth/spreadsheets'
   ],
