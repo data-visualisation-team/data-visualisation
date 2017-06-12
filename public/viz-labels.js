@@ -481,7 +481,7 @@ function zoomToNode(n){
 // move the view to focus on a particular location
 // ===================================
 function showLocation(x, y, scale){
-  zoom.translate([x,y]);
+  //zoom.translate([x,y]);
   rootg.attr("transform", "translate("+ x + "," + y  + ") scale(" + scale + ")");
 }
 
@@ -493,15 +493,15 @@ function assignMoveAndZoomControls(){
     $('#zoomIn').on('click', function(){zoomIn()});
     function zoomIn(){
       var curr = d3.transform(rootg.attr("transform"))
-      // var dx = (curr.translate[0] * curr.scale[0] + 0.1)
-      // var dy = (curr.translate[1] * curr.scale[0] + 0.1)
-      rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] + 0.1) + ")");
-      // rootg.attr("transform", "translate("+ dx + "," + dy  + ") scale(" + (curr.scale[0] + 0.1) + ")");
+      showLocation(curr.translate[0] , curr.translate[1], curr.scale[0] + 0.1)
+
+      //rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] + 0.1) + ")");
+      //rootg.attr("transform", "matrix()";
     }
     $('#zoomOut').on('click', function(){zoomOut()});
     function zoomOut(){
       var curr = d3.transform(rootg.attr("transform"))
-      rootg.attr("transform", "translate("+ curr.translate[0] + "," + curr.translate[1]  + ") scale(" + (curr.scale[0] - 0.1) + ")");
+      showLocation(curr.translate[0], curr.translate[1], curr.scale[0] - 0.1)
     }
 
     $('#moveUp').on('click', function(){moveUp();});
