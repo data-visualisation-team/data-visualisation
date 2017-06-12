@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
 const google = require('googleapis')
-const credentials = require('./credentials.json')
+const credentials = require('./' + process.env.CREDENTIALS + '.json')
 
 const auth = new google.auth.JWT(
   credentials.client_email,
@@ -16,7 +16,6 @@ const auth = new google.auth.JWT(
   ],
   null
 )
-
 google.options({auth})
 
 const sheets = google.sheets('v4')
